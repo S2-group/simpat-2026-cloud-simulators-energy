@@ -1,0 +1,37 @@
+global:
+  # How frequently to scrape targets by default.
+  scrape_interval: 5s
+  # How long until a scrape request times out.
+  scrape_timeout: 5s
+  # How frequently to evaluate rules.
+  evaluation_interval: 1m
+
+rule_files:
+  - "/etc/prometheus/alert.rules"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093
+
+scrape_configs:
+  - job_name: "ts-ui-dashboard"
+    metrics_path: "metrics"
+    static_configs:
+      - targets: ["145.108.225.17:8080"]
+
+  - job_name: "node-exporter"
+    metrics_path: "metrics"
+    static_configs:
+      - targets: ["145.108.225.17:9100"]
+
+  - job_name: "scaphandre"
+    metrics_path: "metrics"
+    static_configs:
+      - targets: ["145.108.225.17:10684"]
+
+  - job_name: "cadvisor"
+    metrics_path: "metrics"
+    static_configs:
+      - targets: ["145.108.225.17:8082"]

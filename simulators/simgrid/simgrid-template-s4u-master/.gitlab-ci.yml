@@ -1,0 +1,152 @@
+# This file tests that the tutorial template remains usable for many users, regardless of their environment
+# There is several tests:
+#   A: against several versions of our docker stable image
+#   B: against official packages of Debian and Ubuntu
+#   C: against our specific docker image
+
+# (TEST A) test the tutorial against our simgrid/stable docker images
+#####################################################################
+# Targets: simgrid git + 4 last simgrid releases (at most)
+
+.build_our_img: &build_our_img
+  script:
+    - apt-get update
+    - apt-get install -y cmake build-essential libboost-dev python-is-python3
+    - cmake .
+    - make VERBOSE=1
+    - ./master-workers small_platform.xml master-workers_d.xml
+    - ./ping-pong cluster_platform.xml
+    # Test python only if the module is there
+    - python --version
+    - if find /usr/lib/ -name 'simgrid.cpython*so' | grep so ; then python master-workers.py small_platform.xml master-workers_d.xml ; else echo "Python module not found"; fi
+
+test-git-unstable:
+  image:
+    name: simgrid/unstable
+    entrypoint: ['/bin/bash', '-c', 'ln -snf /bin/bash /bin/sh && /bin/bash -c $0' ]
+  only:
+   - master
+  <<: *build_our_img
+
+test-git-v4.0:
+  image: simgrid/stable:v4.0
+  only:
+   - master
+  <<: *build_our_img
+
+test-git-v3.36:
+  image: simgrid/stable:v3.36
+  only:
+   - master
+  <<: *build_our_img
+
+test-git-v3.35:
+  image: simgrid/stable:v3.35
+  only:
+   - master
+  <<: *build_our_img
+
+# I forgot to push the v3.34 tag and simgrid v3.33 was never released
+
+test-git-v3.32:
+  image: simgrid/stable:v3.32
+  only:
+   - master
+  <<: *build_our_img
+
+test-git-v3.31:
+  image: simgrid/stable:v3.31
+  only:
+   - master
+  <<: *build_our_img
+
+test-git-v3.30:
+  image: simgrid/stable:v3.30
+  only:
+   - master
+  <<: *build_our_img
+
+test-git-v3.29:
+  image: simgrid/stable:v3.29
+  <<: *build_our_img
+
+test-git-v3.28:
+  image: simgrid/stable:v3.28
+  <<: *build_our_img
+
+test-git-v3.27:
+  image: simgrid/stable:v3.27
+  <<: *build_our_img
+
+test-git-v3.26:
+  image: simgrid/stable:v3.26
+  only:
+   - simgrid-v3.25
+  <<: *build_our_img
+
+# (TEST B) test against several official docker images
+######################################################
+# v3.25 is Debian 11, Ubuntu 20.10, Ubuntu 21.04
+# S4U API broke in v3.22, we cannot easily make this template working with previous versions.
+
+# Ubuntu's tzdata requires TZ=Europe/Paris DEBIAN_FRONTEND=noninteractive in at least v20.04 to v21.10
+
+.build_pkg: &build_pkg
+  script:
+    - apt-get update
+    - TZ=Europe/Paris DEBIAN_FRONTEND=noninteractive apt-get install -y cmake build-essential libsimgrid-dev python3-simgrid
+    - cmake .
+    - make VERBOSE=1
+    - ./master-workers small_platform.xml master-workers_d.xml
+    - ./ping-pong cluster_platform.xml
+    # Test python only if the module is there
+    - if find /usr/lib/ -name 'simgrid.cpython*so' | grep -q so ; then python3 master-workers.py small_platform.xml master-workers_d.xml ; else echo "Python module not found"; fi
+
+test-git-debian12:
+  image: debian:12
+  <<: *build_pkg
+
+test-git-debian11:
+  image: debian:11
+  only: 
+   - simgrid-v3.25
+  <<: *build_pkg
+
+# On ubuntu 20:04, the python module is provided as simgrid.cpython-37m-x86_64-linux-gnu but the default python version is 3.8
+# So don't test that version that won't work
+
+# Some Ubuntu images require the entrypoint to be specified. And we need /bin/sh to be bash :(
+# See https://gitlab.com/gitlab-org/gitlab-runner/-/issues/27614
+#
+test-git-ubuntu2204:
+  image:
+    name: ubuntu:22.04
+    entrypoint: ['/bin/bash', '-c', 'ln -snf /bin/bash /bin/sh && /bin/bash -c $0' ]
+  <<: *build_pkg
+test-git-ubuntu2404:
+  image:
+    name: ubuntu:24.04
+    entrypoint: ['/bin/bash', '-c', 'ln -snf /bin/bash /bin/sh && /bin/bash -c $0' ]
+  <<: *build_pkg
+test-git-ubuntu2410:
+  image:
+    name: ubuntu:24.10
+    entrypoint: ['/bin/bash', '-c', 'ln -snf /bin/bash /bin/sh && /bin/bash -c $0' ]
+  <<: *build_pkg
+
+# (TEST C) Test the simgrid/tuto-s4u docker image
+#################################################
+test-image:
+  image:
+    name: simgrid/tuto-s4u
+    entrypoint: ['/bin/bash', '-c', 'ln -snf /bin/bash /bin/sh && /bin/bash -c $0' ]
+  script:
+    - mkdir /source/tutorial # create the pseudo-volume
+    - cp -r /source/simgrid-template-s4u.git/* /source/tutorial
+    - cd /source/tutorial
+    - cmake .
+    - make VERBOSE=1
+    - ./master-workers small_platform.xml master-workers_d.xml
+    - ./ping-pong cluster_platform.xml
+    # Test python only if the module is there
+    - if find /usr/lib/ -name 'simgrid.cpython*so' | grep -q so ; then python master-workers.py small_platform.xml master-workers_d.xml ; else echo "Python module not found"; fi

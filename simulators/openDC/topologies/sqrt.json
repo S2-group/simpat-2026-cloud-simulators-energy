@@ -1,0 +1,1 @@
+{"clusters": [{"name": "C01", "count": 1, "hosts": [{"name": "H01", "cpu": {"coreCount": 16, "coreSpeed": 2100}, "memory": {"memorySize": 403726925824}, "powerModel": {"power": 4.38525464009019, "idlePower": 2.3787777867539663, "maxPower": 7.889543293761141, "modelType": "sqrt"}}]}]}

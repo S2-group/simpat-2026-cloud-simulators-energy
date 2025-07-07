@@ -1,0 +1,8 @@
+#name providedBy cores memory isSgxSupported
+StoreMgr Provider 20 200 true
+StoreMgrA A 10 100 true
+Inventory Provider 25 500 true
+Reporting Provider 10 150 true
+ProductDispatcher Provider 20 200 true
+PickUpShop Provider 20 200 true
+Loyalty Provider 20 100 true

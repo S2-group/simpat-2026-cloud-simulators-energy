@@ -1,0 +1,16 @@
+#tenant ComponentType crit start_time duration cores memory
+A Inventory true 0 2000 20 800
+B Inventory true 0 10000 20 800
+C Inventory true 0 1000 20 800
+A Reporting false 0 2000 20 600
+B Reporting false 0 10000 20 600
+C Reporting false 0 1000 20 600
+A ProductDispatcher false 0 2000 30 300
+B ProductDispatcher false 0 10000 30 300
+C ProductDispatcher false 0 1000 30 300
+A StoreMgrA false 0 2000 25 100
+B StoreMgr false 0 10000 30 250
+C StoreMgr false 0 1000 30 250
+A Loyalty true 0 2000 20 1000
+B PickUpShop true 0 10000 15 500
+B Loyalty true 0 10000 20 1000

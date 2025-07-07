@@ -1,0 +1,88 @@
+[[1;34mINFO[m] Scanning for projects...
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m-------------< [0;36mat.ac.uibk.dps.cloud.simulator:dissect-cf[0;1m >--------------[m
+[[1;34mINFO[m] [1mBuilding DISSECT-CF 0.9.8-SNAPSHOT[m
+[[1;34mINFO[m] [1m--------------------------------[ jar ]---------------------------------[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-clean-plugin:2.5:clean[m [1m(default-clean)[m @ [36mdissect-cf[0;1m ---[m
+[[1;34mINFO[m] Deleting /home/meret/Desktop/thesis3/simulators/dissect-cf/dissect-cf-master/target
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-resources-plugin:2.6:resources[m [1m(default-resources)[m @ [36mdissect-cf[0;1m ---[m
+[[1;34mINFO[m] Using 'UTF-8' encoding to copy filtered resources.
+[[1;34mINFO[m] Copying 2 resources
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-compiler-plugin:3.11.0:compile[m [1m(default-compile)[m @ [36mdissect-cf[0;1m ---[m
+[[1;34mINFO[m] Changes detected - recompiling the module! :source
+[[1;34mINFO[m] Compiling 96 source files with javac [debug deprecation release 17 module-path] to target/classes
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-resources-plugin:2.6:testResources[m [1m(default-testResources)[m @ [36mdissect-cf[0;1m ---[m
+[[1;34mINFO[m] Not copying test resources
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-compiler-plugin:3.11.0:testCompile[m [1m(default-testCompile)[m @ [36mdissect-cf[0;1m ---[m
+[[1;34mINFO[m] Not compiling test sources
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-surefire-plugin:3.1.0:test[m [1m(default-test)[m @ [36mdissect-cf[0;1m ---[m
+[[1;34mINFO[m] Tests are skipped.
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-jar-plugin:3.3.0:jar[m [1m(default-jar)[m @ [36mdissect-cf[0;1m ---[m
+[[1;34mINFO[m] Building jar: /home/meret/Desktop/thesis3/simulators/dissect-cf/dissect-cf-master/target/dissect-cf-0.9.8-SNAPSHOT.jar
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-jar-plugin:3.3.0:test-jar[m [1m(default)[m @ [36mdissect-cf[0;1m ---[m
+[[1;34mINFO[m] Skipping packaging of the test-jar
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m>>> [0;32mmaven-source-plugin:3.2.1:jar[m [1m(attach-sources)[0;1m > [0;1mgenerate-sources[m @ [36mdissect-cf[0;1m >>>[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m<<< [0;32mmaven-source-plugin:3.2.1:jar[m [1m(attach-sources)[0;1m < [0;1mgenerate-sources[m @ [36mdissect-cf[0;1m <<<[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-source-plugin:3.2.1:jar[m [1m(attach-sources)[m @ [36mdissect-cf[0;1m ---[m
+[[1;34mINFO[m] Building jar: /home/meret/Desktop/thesis3/simulators/dissect-cf/dissect-cf-master/target/dissect-cf-0.9.8-SNAPSHOT-sources.jar
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-install-plugin:2.4:install[m [1m(default-install)[m @ [36mdissect-cf[0;1m ---[m
+[[1;34mINFO[m] Installing /home/meret/Desktop/thesis3/simulators/dissect-cf/dissect-cf-master/target/dissect-cf-0.9.8-SNAPSHOT.jar to /home/meret/.m2/repository/at/ac/uibk/dps/cloud/simulator/dissect-cf/0.9.8-SNAPSHOT/dissect-cf-0.9.8-SNAPSHOT.jar
+[[1;34mINFO[m] Installing /home/meret/Desktop/thesis3/simulators/dissect-cf/dissect-cf-master/pom.xml to /home/meret/.m2/repository/at/ac/uibk/dps/cloud/simulator/dissect-cf/0.9.8-SNAPSHOT/dissect-cf-0.9.8-SNAPSHOT.pom
+[[1;34mINFO[m] Installing /home/meret/Desktop/thesis3/simulators/dissect-cf/dissect-cf-master/target/dissect-cf-0.9.8-SNAPSHOT-sources.jar to /home/meret/.m2/repository/at/ac/uibk/dps/cloud/simulator/dissect-cf/0.9.8-SNAPSHOT/dissect-cf-0.9.8-SNAPSHOT-sources.jar
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] [1;32mBUILD SUCCESS[m
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] Total time:  5.800 s
+[[1;34mINFO[m] Finished at: 2025-06-19T21:55:11+02:00
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] Scanning for projects...
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m-------< [0;36mhu.mta.sztaki.lpds.cloud.simulator:dissect-cf-examples[0;1m >-------[m
+[[1;34mINFO[m] [1mBuilding DISSECT-CF-Examples 1.0.3-SNAPSHOT[m
+[[1;34mINFO[m] [1m--------------------------------[ jar ]---------------------------------[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-clean-plugin:2.5:clean[m [1m(default-clean)[m @ [36mdissect-cf-examples[0;1m ---[m
+[[1;34mINFO[m] Deleting /home/meret/Desktop/thesis3/simulators/dissect-cf/dissect-cf-examples-master/target
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-resources-plugin:2.6:resources[m [1m(default-resources)[m @ [36mdissect-cf-examples[0;1m ---[m
+[[1;33mWARNING[m] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[[1;34mINFO[m] Copying 1 resource
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-compiler-plugin:2.3.2:compile[m [1m(default-compile)[m @ [36mdissect-cf-examples[0;1m ---[m
+[[1;33mWARNING[m] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
+[[1;34mINFO[m] Compiling 49 source files to /home/meret/Desktop/thesis3/simulators/dissect-cf/dissect-cf-examples-master/target/classes
+[[1;34mINFO[m] -------------------------------------------------------------
+[[1;31mERROR[m] COMPILATION ERROR : 
+[[1;34mINFO[m] -------------------------------------------------------------
+[[1;31mERROR[m] /home/meret/Desktop/thesis3/simulators/dissect-cf/dissect-cf-examples-master/src/main/java/hu/mta/sztaki/lpds/cloud/simulator/examples/custom/MultiIaaSJobDispatcher.java:[204,66] error: ')' or ',' expected
+[[1;34mINFO[m] 1 error
+[[1;34mINFO[m] -------------------------------------------------------------
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] [1;31mBUILD FAILURE[m
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] Total time:  1.476 s
+[[1;34mINFO[m] Finished at: 2025-06-19T21:55:14+02:00
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;31mERROR[m] Failed to execute goal [32morg.apache.maven.plugins:maven-compiler-plugin:2.3.2:compile[m [1m(default-compile)[m on project [36mdissect-cf-examples[m: [1;31mCompilation failure[m
+[[1;31mERROR[m] [1;31m/home/meret/Desktop/thesis3/simulators/dissect-cf/dissect-cf-examples-master/src/main/java/hu/mta/sztaki/lpds/cloud/simulator/examples/custom/MultiIaaSJobDispatcher.java:[204,66] error: ')' or ',' expected[m
+[[1;31mERROR[m] [1;31m[m
+[[1;31mERROR[m] -> [1m[Help 1][m
+[[1;31mERROR[m] 
+[[1;31mERROR[m] To see the full stack trace of the errors, re-run Maven with the [1m-e[m switch.
+[[1;31mERROR[m] Re-run Maven using the [1m-X[m switch to enable full debug logging.
+[[1;31mERROR[m] 
+[[1;31mERROR[m] For more information about the errors and possible solutions, please read the following articles:
+[[1;31mERROR[m] [1m[Help 1][m http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

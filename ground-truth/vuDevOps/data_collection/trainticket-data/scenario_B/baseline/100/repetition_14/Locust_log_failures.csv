@@ -1,0 +1,5 @@
+Method,Name,Error,Occurrences
+GET,/api/v1/foodservice/foods/2025-06-14/Shang%20Hai/Su%20Zhou/D1345,HTTPError('504 Server Error: Gateway Time-out for url: /api/v1/foodservice/foods/2025-06-14/Shang%20Hai/Su%20Zhou/D1345'),100
+POST,/api/v1/preserveservice/preserve,HTTPError('504 Server Error: Gateway Time-out for url: /api/v1/preserveservice/preserve'),100
+GET,/api/v1/adminorderservice/adminorder,HTTPError('504 Server Error: Gateway Time-out for url: /api/v1/adminorderservice/adminorder'),106
+POST,/api/v1/travelservice/trips/left,HTTPError('504 Server Error: Gateway Time-out for url: /api/v1/travelservice/trips/left'),100

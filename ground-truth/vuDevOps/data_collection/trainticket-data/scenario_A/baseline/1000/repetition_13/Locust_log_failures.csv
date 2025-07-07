@@ -1,0 +1,22 @@
+Method,Name,Error,Occurrences
+POST,/api/v1/travelservice/trips/left,RemoteDisconnected('Remote end closed connection without response'),27443
+GET,/client_login.html,RemoteDisconnected('Remote end closed connection without response'),4828
+GET,/api/v1/adminorderservice/adminorder,"ConnectionResetError(104, 'Connection reset by peer')",9
+POST,/api/v1/users/login,HTTPError('500 Server Error: Internal Server Error for url: /api/v1/users/login'),8
+GET,/adminlogin.html,"ConnectionResetError(104, 'Connection reset by peer')",746
+GET,/api/v1/adminorderservice/adminorder,HTTPError('504 Server Error: Gateway Time-out for url: /api/v1/adminorderservice/adminorder'),611
+GET,/api/v1/verifycode/generate,"ConnectionResetError(104, 'Connection reset by peer')",6183
+GET,/api/v1/adminuserservice/users,"ConnectionResetError(104, 'Connection reset by peer')",34
+GET,/index.html,RemoteDisconnected('Remote end closed connection without response'),27833
+POST,/api/v1/users/login,RemoteDisconnected('Remote end closed connection without response'),9546
+GET,/client_login.html,"ConnectionResetError(104, 'Connection reset by peer')",790
+POST,/api/v1/travelservice/trips/left,HTTPError('504 Server Error: Gateway Time-out for url: /api/v1/travelservice/trips/left'),1296
+GET,/api/v1/adminuserservice/users,RemoteDisconnected('Remote end closed connection without response'),297
+GET,/index.html,"ConnectionResetError(104, 'Connection reset by peer')",4568
+POST,/api/v1/users/login,"ConnectionResetError(104, 'Connection reset by peer')",1609
+GET,/api/v1/verifycode/generate,RemoteDisconnected('Remote end closed connection without response'),32361
+POST,/api/v1/travelservice/trips/left,HTTPError('500 Server Error: Internal Server Error for url: /api/v1/travelservice/trips/left'),14
+GET,/api/v1/verifycode/generate,HTTPError('500 Server Error: Internal Server Error for url: /api/v1/verifycode/generate'),10
+GET,/adminlogin.html,RemoteDisconnected('Remote end closed connection without response'),4685
+POST,/api/v1/travelservice/trips/left,"ConnectionResetError(104, 'Connection reset by peer')",5394
+GET,/api/v1/adminorderservice/adminorder,RemoteDisconnected('Remote end closed connection without response'),210

@@ -1,0 +1,25 @@
+Method,Name,Error,Occurrences
+POST,/api/v1/travelservice/trips/left,RemoteDisconnected('Remote end closed connection without response'),5704
+GET,/client_login.html,RemoteDisconnected('Remote end closed connection without response'),912
+GET,/api/v1/adminorderservice/adminorder,"ConnectionResetError(104, 'Connection reset by peer')",325
+POST,/api/v1/users/login,HTTPError('500 Server Error: Internal Server Error for url: /api/v1/users/login'),9
+GET,/adminlogin.html,"ConnectionResetError(104, 'Connection reset by peer')",309
+GET,/api/v1/adminorderservice/adminorder,HTTPError('504 Server Error: Gateway Time-out for url: /api/v1/adminorderservice/adminorder'),1852
+GET,/api/v1/verifycode/generate,"ConnectionResetError(104, 'Connection reset by peer')",3159
+GET,/api/v1/adminuserservice/users,"ConnectionResetError(104, 'Connection reset by peer')",196
+GET,/index.html,RemoteDisconnected('Remote end closed connection without response'),5803
+POST,/api/v1/users/login,RemoteDisconnected('Remote end closed connection without response'),2110
+GET,/client_login.html,"ConnectionResetError(104, 'Connection reset by peer')",373
+GET,/api/v1/adminuserservice/users,RemoteDisconnected('Remote end closed connection without response'),640
+GET,/index.html,"ConnectionResetError(104, 'Connection reset by peer')",2168
+POST,/api/v1/users/login,"ConnectionResetError(104, 'Connection reset by peer')",871
+POST,/api/v1/travel2service/trips/left,HTTPError('500 Server Error: Internal Server Error for url: /api/v1/travel2service/trips/left'),6
+GET,/api/v1/verifycode/generate,RemoteDisconnected('Remote end closed connection without response'),6709
+POST,/api/v1/travelservice/trips/left,HTTPError('500 Server Error: Internal Server Error for url: /api/v1/travelservice/trips/left'),9
+GET,/api/v1/verifycode/generate,HTTPError('500 Server Error: Internal Server Error for url: /api/v1/verifycode/generate'),11
+POST,/api/v1/travel2service/trips/left,RemoteDisconnected('Remote end closed connection without response'),5484
+POST,/api/v1/travel2service/trips/left,"ConnectionResetError(104, 'Connection reset by peer')",1797
+GET,/adminlogin.html,RemoteDisconnected('Remote end closed connection without response'),1016
+GET,/api/v1/adminuserservice/users,HTTPError('500 Server Error: Internal Server Error for url: /api/v1/adminuserservice/users'),1
+POST,/api/v1/travelservice/trips/left,"ConnectionResetError(104, 'Connection reset by peer')",2422
+GET,/api/v1/adminorderservice/adminorder,RemoteDisconnected('Remote end closed connection without response'),964

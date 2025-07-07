@@ -1,0 +1,15 @@
+{
+    "name": null,
+    "outputFolder": null,
+    "runs": 1,
+    "maxNumFailures": [10],
+    "topologies": [{
+        "pathToFile": null
+    }],
+    "exportModels": [{
+        "exportInterval": 1
+    }],
+    "allocationPolicies": [{
+        "policyType": "Random"
+    }]
+}

@@ -1,0 +1,23 @@
+version: '3.9'
+
+services:
+  scaphandre:
+    image: hubblo/scaphandre
+    container_name: scaphandre
+    restart: unless-stopped
+    deploy:
+      mode: global
+    privileged: true
+    ports:
+      - 10684:8080
+    volumes:
+      - type: bind
+        source: /proc
+        target: /proc
+      - type: bind
+        source: /sys/class/powercap
+        target: /sys/class/powercap
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+    command: ["-v", "prometheus", "--containers"]

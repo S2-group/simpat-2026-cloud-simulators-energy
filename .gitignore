@@ -1,0 +1,10 @@
+.venv
+logs.log
+__pycache__
+.pyc
+.log
+build
+temp.txt
+tempt.txt
+evaluation/energy/*.energy
+evaluation/gen_big_dataset.py

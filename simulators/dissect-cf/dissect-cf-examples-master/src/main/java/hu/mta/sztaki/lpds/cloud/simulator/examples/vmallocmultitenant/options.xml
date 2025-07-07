@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="requestsSource">file</entry>
+<entry key="securePmNum">30</entry>
+<entry key="pmValues">400 0.1 16000</entry>
+<entry key="logging">false</entry>
+<entry key="consFreq">60000</entry>
+<entry key="normalPmNum">70</entry>
+</properties>
