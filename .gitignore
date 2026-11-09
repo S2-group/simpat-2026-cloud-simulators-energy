@@ -1,4 +1,5 @@
 .venv
+.vscode/
 logs.log
 __pycache__
 .pyc
