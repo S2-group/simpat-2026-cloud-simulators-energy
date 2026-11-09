@@ -9,6 +9,7 @@ tempt.txt
 evaluation/energy/*.energy
 evaluation/gen_big_dataset.py
 
+traces/*
 Data/*
 Data.zip
 
@@ -18,7 +19,6 @@ simulators/simgrid/outputs-new/*
 simulators/simgrid/outputs/*
 simulators/dissect-cf/outputs/*
 
-evaluation/simulator_energies.rda
 runs.time
 runs_with_comms.time
 
