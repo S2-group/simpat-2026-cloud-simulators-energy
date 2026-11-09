@@ -28,7 +28,9 @@ def get_runtimes(path):
 
     if "openDC" in path:
         time_df.apply(lambda row: opendc_row(row, runtimes), axis=1)
+        print(time_df)
     else:
+        time_df = time_df.query("`users` == 1000")
         runtimes = time_df.time.values
 
     return runtimes
@@ -70,7 +72,7 @@ if __name__ == "__main__":
 
     scatter_color = "#E57E00"
     line_color = "black"
-
+    fig, ax = plt.subplots(figsize=(16, 8), constrained_layout=True)
     # sns.swarmplot(x="simulator", y="simulation time (s)", data=df, dodge=True, color="orange", s=7)
     sns.stripplot(x="simulator", y="simulation time (s)", data=df, dodge=True, color=scatter_color, jitter=0.35, s=7, alpha=0.3)
     ax = sns.boxplot(
@@ -103,6 +105,8 @@ if __name__ == "__main__":
     ax.tick_params(axis="both", labelsize=fs)
 
     # plt.tight_layout()
+    #plt.constrained_layout()
+    plt.savefig("../../runtimes.pdf")
     plt.show()
     # fig = plt.gcf()
     # fig.set_size_inches((8.5, 11), forward=False)

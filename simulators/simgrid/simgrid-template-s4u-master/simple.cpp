@@ -87,7 +87,7 @@ static void run_traces(int sample_time, std::vector<double> data) {
 
 static void service_run() {
     std::ostringstream oss;
-    oss << "../../../../traces/" << test_system << "/" << scenario << "/" << users << "/" << repetition << "/services/" << sg4::this_actor::get_cname() << "_cpu_usage.data";
+    oss << "../../../traces/" << test_system << "/" << scenario << "/" << users << "/" << repetition << "/services/" << sg4::this_actor::get_cname() << "_cpu_usage.data";
     std::vector<double> data = readTrace(oss.str());
 
     run_traces(5, data);
@@ -101,7 +101,7 @@ static void monitor_energy() {
     double since_last, energy;
 
     std::ostringstream oss;
-    oss << "../../outputs/simple/" << test_system << "/" << scenario << "/" << users << "/" << repetition << "/" << run;
+    oss << "../outputs/simple/" << test_system << "/" << scenario << "/" << users << "/" << repetition << "/" << run;
     std::filesystem::create_directories(oss.str());
     std::ofstream out(oss.str() + "/energy.data");
 
@@ -140,19 +140,19 @@ int main(int argc, char* argv[]) {
     users = argv[3];
     repetition = argv[4];
     run = argv[5];
-    e.load_platform("../../../../traces/platform.xml");
+    e.load_platform("../../../traces/platform.xml");
 
-    std::vector<ServiceProperties> properties = read_properties(std::string("../../../../traces/") + test_system + "/" + scenario + "/" + users + "/" + repetition + "/services-overview.data");
+    std::vector<ServiceProperties> properties = read_properties(std::string("../../../traces/") + test_system + "/" + scenario + "/" + users + "/" + repetition + "/services-overview.data");
     std::sort(properties.begin(), properties.end(), [](ServiceProperties& a, ServiceProperties& b) {
         return a.cpu_count > b.cpu_count;
     });
 
 
     for (ServiceProperties props : properties) {
-        e.add_actor(props.name.c_str(), e.host_by_name("host1"), service_run);
+	simgrid::s4u::ActorPtr a = simgrid::s4u::Actor::create(props.name.c_str(), e.host_by_name("host1"), service_run);
     }
-
-    e.add_actor("energy_monitor", e.host_by_name("host3"), monitor_energy);
+	
+    simgrid::s4u::ActorPtr b = simgrid::s4u::Actor::create("energy_monitor", e.host_by_name("host3"), monitor_energy);
 
     e.run();
 

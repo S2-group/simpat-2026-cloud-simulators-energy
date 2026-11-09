@@ -5,7 +5,7 @@ if [[ $1 == "0" ]]; then
     echo "rank,test_system,scenario,users,repetition,powermodel,run,time"> ./runs.time
 
     cd dissect-cf-master/
-    mvn clean install -U -Dmaven.test.skip=true
+    mvn clean install -U -Dmaven.test.skip=false
     if [ $? -ne 0 ]; then
         exit 1;
     fi
@@ -17,9 +17,9 @@ if [[ $1 == "0" ]]; then
     fi
     cd ..
 
-    mkdir outputs
-    mkdir outputs/constant
-    mkdir outputs/linear
+    mkdir -p outputs
+    mkdir -p outputs/constant
+    mkdir -p outputs/linear
 fi
 
 cd dissect-cf-examples-master

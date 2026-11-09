@@ -87,7 +87,7 @@ static void run_traces(int sample_time, std::vector<double> data) {
 
 static void service_run() {
     std::ostringstream oss;
-    oss << "../../../../traces/" << test_system << "/" << scenario << "/" << users << "/" << repetition << "/services/" << sg4::this_actor::get_cname() << "_cpu_usage.data";
+    oss << "../../../traces/" << test_system << "/" << scenario << "/" << users << "/" << repetition << "/services/" << sg4::this_actor::get_cname() << "_cpu_usage.data";
     std::vector<double> data = readTrace(oss.str());
 
     run_traces(5, data);
@@ -97,89 +97,100 @@ static void service_run() {
 static void host1respond(simgrid::s4u::Mailbox* in, simgrid::s4u::Mailbox* out)
 {
     std::ostringstream oss;
-    oss << "../../../../traces/" << test_system << "/" << scenario << "/" << users << "/" << repetition << "/comms_size.data";
+    oss << "../../../traces/" << test_system << "/" << scenario << "/" << users << "/" << repetition << "/comms_size.data";
     std::vector<double> res_size_data = readTrace(oss.str());
     int avg_res_size = (int) res_size_data[0];
 
     std::vector<simgrid::s4u::CommPtr> all_comms;
     while (true) {
-        double *sender_time = in->get<double>();
-        if (*sender_time == -1.0) { // stop sign
+        double time = *in->get<double>();
+        if (time == -1.0) { // stop sign
             XBT_INFO("Server1 received final message");
-            delete sender_time;
+            //delete sender_time;
             break;
         }
 
-        XBT_INFO("Server1 received req sender_time=%f", *sender_time);
-        delete sender_time;
+        XBT_INFO("Server1 received req sender_time=%f", time);
+        //delete sender_time;
 
-        double *payload = new double(simgrid::s4u::Engine::get_clock());
-        auto comm = out->put_async(payload, avg_res_size); // arbitrary (small) size of 200 bytes
-        all_comms.push_back(comm);
-        // out->put(payload, avg_res_size);
+        //double *payload = new double(simgrid::s4u::Engine::get_clock());
+        time = simgrid::s4u::Engine::get_clock();
+	out->put(&time, avg_res_size); // arbitrary (small) size of 200 bytes
+        //comm->wait();
+	//all_comms.push_back(comm);
+        //out->put(payload, avg_res_size);
     }
 
     XBT_INFO("Server1 starting to wait");
     // Wait for all comms
-    for (auto c : all_comms) {
-        c->wait();
-    }
+    //for (auto c : all_comms) {
+    //    c->wait();
+    //}
 }
 
 static void host2send(simgrid::s4u::Mailbox* in, simgrid::s4u::Mailbox* out)
 {
     std::ostringstream oss;
-    oss << "../../../../traces/" << test_system << "/" << scenario << "/" << users << "/" << repetition << "/comms.data";
+    oss << "../../../traces/" << test_system << "/" << scenario << "/" << users << "/" << repetition << "/comms.data";
     std::vector<double> req_data = readTrace(oss.str());
-
+    
+    double time;
     double start_time = simgrid::s4u::Engine::get_clock();
     double time_steps = 0.0;
-    std::vector<simgrid::s4u::CommPtr> all_comms;
+    //std::vector<simgrid::s4u::CommPtr> all_comms;
     for (double reqs : req_data) {
         // Send out requests
         for (int i = 0; i < (int) reqs; i++) {
-            double *payload = new double(simgrid::s4u::Engine::get_clock());
-            auto comm = out->put_async(payload, 50); // arbitrary (small) size of 50 bytes
-            all_comms.push_back(comm);
+            //double *payload = new double(simgrid::s4u::Engine::get_clock());
+            time = simgrid::s4u::Engine::get_clock();
+	    out->put(&time, 50); // arbitrary (small) size of 50 bytes
+   
+	    time = *in->get<double>();
+ 	    XBT_INFO("Server2 received res sender_time=%f", time);
+	    //comm->wait();
+	    //all_comms.push_back(comm);
         }
         XBT_INFO("Server2 sent %d reqs", (int) reqs);
         // Receive responses from previous round
-        while (in->listen()) {
-            double *sender_time = in->get<double>();
-            XBT_INFO("Server2 received res sender_time=%f", *sender_time);
-            delete sender_time;
-        }
+        //while (in->listen()) {
+        //    double *sender_time = in->get<double>();
+        //    XBT_INFO("Server2 received res sender_time=%f", *sender_time);
+        //    delete sender_time;
+        //}
 
-        double time_elapsed = simgrid::s4u::Engine::get_clock() - start_time;
-        if (time_elapsed < time_steps) {
-            XBT_INFO("Server2 sleeping for %f", time_steps - time_elapsed);
-            sg4::this_actor::sleep_for(time_steps - time_elapsed);
-        }
+        //double time_elapsed = simgrid::s4u::Engine::get_clock() - start_time;
+        //if (time_elapsed < time_steps) {
+        //    XBT_INFO("Server2 sleeping for %f", time_steps - time_elapsed);
+        //    sg4::this_actor::sleep_for(time_steps - time_elapsed);
+        //}
+	
+	//sg4::this_actor::sleep_for(0.01);
 
         time_steps++;
     }
 
-    while (in->listen()) {
-        double *sender_time = in->get<double>();
-        XBT_INFO("Server2 received res sender_time=%f", *sender_time);
-        delete sender_time;
-    }
+   //while (in->listen()) {
+   //     double *sender_time = in->get<double>();
+   //     XBT_INFO("Server2 received res sender_time=%f", *sender_time);
+   //     delete sender_time;
+    //}
 
-    XBT_INFO("Server2 starting to wait");
+    //XBT_INFO("Server2 starting to wait");
     // Wait for all comms
-    for (auto c : all_comms) {
-        c->wait();
-    }
+    //for (auto c : all_comms) {
+    //    c->wait();
+    //}
 
-    while (in->listen()) {
-        double *sender_time = in->get<double>();
-        XBT_INFO("Server2 received res sender_time=%f", *sender_time);
-        delete sender_time;
-    }
+    //while (in->listen()) {
+    //    double *sender_time = in->get<double>();
+    //    XBT_INFO("Server2 received res sender_time=%f", *sender_time);
+    //    delete sender_time;
+    //}
 
     XBT_INFO("Server2 sending finish signal");
     // Send finish signal
-    out->put(new double(-1.0), 1);
+    time = -1.0;
+    out->put(&time, 1);
     return;
 }
 
@@ -190,7 +201,7 @@ static void monitor_energy() {
     double since_last, energy;
 
     std::ostringstream oss;
-    oss << "../../outputs/simple-with-comms/" << test_system << "/" << scenario << "/" << users << "/" << repetition << "/" << run;
+    oss << "../outputs/simple-with-comms/" << test_system << "/" << scenario << "/" << users << "/" << repetition << "/" << run;
     std::filesystem::create_directories(oss.str());
     std::ofstream out(oss.str() + "/energy.data");
 
@@ -229,19 +240,19 @@ int main(int argc, char* argv[]) {
     users = argv[3];
     repetition = argv[4];
     run = argv[5];
-    e.load_platform("../../../../traces/platform.xml");
+    e.load_platform("../../../traces/platform.xml");
 
-    std::vector<ServiceProperties> properties = read_properties(std::string("../../../../traces/") + test_system + "/" + scenario + "/" + users + "/" + repetition + "/services-overview.data");
+    std::vector<ServiceProperties> properties = read_properties(std::string("../../../traces/") + test_system + "/" + scenario + "/" + users + "/" + repetition + "/services-overview.data");
     std::sort(properties.begin(), properties.end(), [](ServiceProperties& a, ServiceProperties& b) {
         return a.cpu_count > b.cpu_count;
     });
 
 
     for (ServiceProperties props : properties) {
-        e.add_actor(props.name.c_str(), e.host_by_name("host1"), service_run);
+	    simgrid::s4u::Actor::create(props.name.c_str(), e.host_by_name("host1"), service_run);
     }
-
-    e.add_actor("energy_monitor", e.host_by_name("host3"), monitor_energy);
+	
+    simgrid::s4u::Actor::create("energy_monitor", e.host_by_name("host3"), monitor_energy);
 
     simgrid::s4u::Mailbox* mb1 = simgrid::s4u::Mailbox::by_name("Mailbox1");
     simgrid::s4u::Mailbox* mb2 = simgrid::s4u::Mailbox::by_name("Mailbox2");
