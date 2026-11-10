@@ -1,0 +1,168 @@
+\section{Results}
+\subsection{RQ1: Suitability for Simulating Energy Usage} \label{sec:resultsEnergy}
+\subsubsection{RQ1.1 Accuracy of Simulators} \label{sec:accuracy}
+In \autoref{tab:powermodelOverview}, we can see an overview of the mean relative error per power model for the selected simulators. There, we can see that \textit{OpenDC} consistently is most accurate across all tested power models. It is followed by \textit{CloudSim} for the cubic power model and then \textit{NetworkCloudSim} for the cubic and \textit{SimGrid} for the linear power model. In the table, we can see that the MRE for \textit{SimGrid} is the same for both workload definitions both with and without communication. Indeed, using the Mann-Whitney U test, we obtain a p-value of 1.0, which indicates that there is no evidence of a significant difference between the two workload definitions. By performing the test on the simulated values of \textit{CloudSim} and \textit{NetworkCloudSim}, we obtain a p-value of 0.31 indicating that there is not a significant difference between the results of these simulators. However, because in previous test runs the p-value reported as 0.0 the \textit{NetworkCloudSim} results were included for comparison. By performing the Kruskal–Wallis test on all five simulators, we obtain a p-value of again 0.0, indicating evidence of a significant different between the simulators.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.5\linewidth]{vu-cs-research-thesis/figures/double_cdf.pdf}
+    \caption{CDF diagrams for the total energy consumption simulated by the five simulators with their best-performing power models and the ground truth measures.}
+    % \Description{CDF diagrams for the total energy consumption simulated by the five simulators with their best-performing power models and the ground truth measures.}
+    \label{fig:cdf}
+\end{figure}
+
+\begin{table}[t]
+\centering
+\caption{Mean standard deviation of simulated power consumption in Watt over runs of the same input workload.}
+\label{tab:deterministic}
+\begin{tabular}{lr}
+\textbf{Simulator}  & \textbf{Mean std} \\ \hline
+\textit{CloudSim}   & 0.089 \\
+\textit{DISSECT-CF} & 0.484 \\
+NetworkCloudSim     & 0.089 \\
+\textit{OpenDC}     & 0.160 \\
+\textit{SimGrid}    & 3.412e-6
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.5\linewidth]{vu-cs-research-thesis/figures/mean_total_pwr.pdf}
+    \caption{Mean total energy consumption in Joules for each simulator's power model that is most accurate on average.}
+    % \Description{Mean total energy consumption in Joules for each simulator's power model that is most accurate on average.}
+    \label{fig:bestOverTime}
+\end{figure}
+
+Between \textit{CloudSim} and \textit{NetworkCloudSim}, the MRE seems to be very similar as well. As we can see in \autoref{fig:bestOverTime}, \textit{NetworkCloudSim} consistently produces slightly higher energy usage values than \textit{CloudSim}. It is also notable that in the same figure, we can see that both \textit{CloudSim} and \textit{NetworkCloudSim} overestimate the energy usage. For the linear power model, \textit{OpenDC} overestimates the energy usage, while it underestimates it for the other power models. \textit{DISSECT-CF} on the other hand underestimates in the constant model but overestimates in the linear model. Furthermore, we can see that at until about half-way through the measuring window, the \textit{OpenDC} with the non-constant models, \textit{SimGrid} and even \textit{DISSECT-CF} with the constant power model have a smaller error. As the total energy starts to increase more rapidly, \textit{OpenDC} with the constant power model becomes the most accurate.
+
+As discussed in \autoref{sec:accuracy}, the power model that most accurately simulates the power usage seems to change over time. This suggests that dynamic power models could estimate energy usage more accurately over time. It is notable that, even while the simulator-power model combination that simulates the energy usage most accurately changes over time, \textit{OpenDC} is consistently among the most accurate simulators in terms of energy use. At the beginning until around the 4 minute mark, \textit{OpenDC} with non-constant power models, \textit{SimGrid} and \textit{DISSECT-CF} with constant power model are most accurate. It is only within the last 1-2 minutes that \textit{OpenDC}'s constant power model is the most accurate.
+
+In both \autoref{fig:cdf} and \autoref{fig:overtimes}, we can see that the degree by which the simulators produce incorrect energy usage values is greater for Train Ticket workloads than for those from Sock Shop. This is especially the case for \textit{CloudSim} and \textit{NetworkCloudSim} and suggests that these simulators perform better for simpler microservice systems than complexer ones.
+
+% das hier ist kein echtes Problem, aber deine Formulierung, dass that the degree by which s.th. produces incorrect values is greater" ist ein bisschen komisch. Denn: du schreibst dass das incorrect is greater. ich würde erwarten, dass du schreibst dass die Fehler bei den anderen geringer sind. aber wenn es um diesen konkreten simulator gehen soll, dann ist deins sicher okay.
+
+\begin{figure*}[ht]
+    \centering
+    \includegraphics[width=0.95\linewidth]{vu-cs-research-thesis/figures/multi_image_fig-1.pdf}
+    \caption{Mean energy usage over time for different application-scenario-users combinations.}
+    % \Description{Mean energy usage over time for different application-scenario-users combinations.}
+    \label{fig:overtimes}
+\end{figure*}
+
+\begin{table*}[ht]
+\centering
+\caption{Energy usage capabilities of the selected simulators.}
+\label{tab:energyFuncs}
+\begin{tabular}{l|ccccc}
+ & \textit{\textbf{CloudSim}} & \textit{\textbf{DISSECT-CF}} & \textit{\textbf{NetworkCloudSim}} & \textit{\textbf{OpenDC}} & \textit{\textbf{SimGrid}} \\ \hline
+Host & \yes & \yes & \yes (custom) & \yes & \yes \\
+Storage & \no & \yes & \no & \no & \no \\
+Network & \no & \no & \no &  & \yes \\
+WiFi & \no & \no & \no & \no & \yes \\
+Battery & \no & \no & \no & \yes & \yes \\
+Solar Panel & \no & \no & \no & \no & \yes \\
+Chiller & \no & \no & \no & \no & \yes \\
+Carbon trace & \no & \no & \no & \yes & \no 
+\end{tabular}
+\end{table*}
+
+\subsubsection{RQ1.2: Accuracy of Simulators' Power Models} \label{sec:powermodelAccuracy}
+With regards to power models, we can note that constant power models perform relatively well, having the highest accuracy for \textit{OpenDC} and \textit{DISSECT-CF} although the two simulators have two different definitions for the constant power draw. For \textit{CloudSim}, the cubic power model is the most accurate. For the other models, linear, square and square root, \textit{CloudSim} has high MREs. It is notable that the \textit{CloudSim} power models are quite similar to those used by \textit{OpenDC}, while their simulated values are very different, especially for the square root power model. They both calculate a factor that is the difference between the energy consumption values given for maximum and idle CPU utilization at initialization and then multiply this factor with a value dependent on the power model. For the square root power model, for example, the square root of a utilization value in time to get the corresponding energy consumption value. During the calculation of this factor at the beginning, \textit{CloudSim} also divides it by the square root of 100. In order to check that the different power models do indeed produce different energy usage values, the Kruskal-Wallis test was carried out on the power models both across simulators and for each simulator separately. These tests all resulted in a p-value of 0.0, indicating that there is indeed evidence of the power models producing significantly different energy usage values.
+
+Finally, we can look at the standard deviation across runs for the same input trace (application, scenario, users, repetition combination) in \autoref{tab:deterministic}. There, we can see that \textit{SimGrid} is the only simulator that seems to produce near-deterministic results.
+
+% cloudsim stdev: mean=0.09447424912870069
+% networkcloudsim stdev: mean=0.08822786492183718
+% dissectcf stdev: mean=0.48362530219488303
+% opendc stdev: mean=0.15973152047968375
+% simgrid stdev: mean=3.4124647384170898e-06
+
+In terms of host energy usage simulation, \textit{OpenDC} has both the highest accuracy and the most power models to choose from. In terms of accuracy, it is followed by \textit{SimGrid}, although this simulator only employs a linear power model. \textit{CloudSim} offers the most power models, but only the cubic model produces simulation results comparable to those of the other well-performing models. \textit{CloudSim} does however explicitly offer the possibility of using a self-defined power model, which could be defined to be a direct mapping from CPU utilization to power consumption values, while the other simulators do not do so. 
+
+\begin{table*}[htbp]
+\centering
+\caption{System topology parameters of the selected simulators.}
+\label{tab:topologyParams}
+\begin{tabular}{ll|lllll}
+\textbf{Resource} & \textbf{Property} & \textbf{CloudSim} & \textbf{DISSECT-CF} & \textbf{NetworkCloudSim} & \textbf{OpenDC} & \textbf{SimGrid} \\ \hline
+\multirow{4}{*}{Host} & CPU speed & MIPS & instructions per tick & MIPS & MHz & FLOPS \\
+ & Memory & bytes & bytes & bytes & bytes & \no \\
+ & Network bandwidth & B/s & bytes & B/s & \no & \no \\
+ & Network latency & \no & \no & \no & \no & \no \\ \arrayrulecolor{lightgray}\hline
+\multirow{3}{*}{ Storage} & Size & \no & MB & \no & \no & \no \\
+ & Network bandwidth & \no & B/s & \no & \no & \no \\
+ & Disk bandwidth & \no & B/s & \no & \no & \no \\ \arrayrulecolor{lightgray} \hline 
+\multirow{2}{*}{Network link} & Bandwidth & \no & B/s & B/s & \no & bps \\
+ & Latency & \no & ticks & seconds & \no & ms \\ \arrayrulecolor{black} \hline
+\multicolumn{2}{l|}{ Definition method} & in code & in code & in code & JSON & XML \& in code
+\end{tabular}
+\end{table*}
+
+\begin{table*}[htbp]
+    \centering
+    \caption{Workload definition parameters of the selected simulators.}
+    \begin{tabular}{l|lllll}
+     \textbf{Parameter} & \textit{\textbf{CloudSim}} & \textit{\textbf{DISSECT-CF}} & \textit{\textbf{NetworkCloudSim}} & \textit{\textbf{OpenDC}} & \textit{\textbf{SimGrid}} \\ \hline
+    Trace formats & swf & gwf, swf, srtg & swf & parquet & \no \\
+    Definition in code & \yes & \yes & \yes & \no & \yes \\
+    Duration & Million Instructions & seconds & Million Instructions & milliseconds & FLOPS \\
+    CPU consumption & fraction & Instructions & fraction & MHz & \no \\
+    Memory consumption & fraction & kB/processor & fraction & MB & bits \\
+    Bandwidth consumption & fraction & bps & fraction & \no & \no \\
+    Message size & \no & bytes & bytes & \no & bytes \\ \hline
+    \end{tabular}
+    \label{tab:workloadParams}
+\end{table*}
+
+\subsubsubsection{Energy simulation capabilities}
+\autoref{tab:energyFuncs} shows the different capabilities related to energy that the selected simulators offer. There, we can see that \textit{SimGrid} offers the capabilities, providing extensions for the simulation of Host, Network and WiFi energy as well as Batteries, Solar Panels and Chillers (coolers). \textit{DISSECT-CF} is the only simulator to make it possible to simulate the energy usage of storage resources, while \textit{OpenDC} can calculate the carbon footprint of a resource given a carbon trace, as well as simulating batteries.
+
+\subsection{RQ2: Suitability to Simulating Microservices}
+\subsubsection{RQ2.2 Configurability}
+While the available models and extents to which the simulators support simulation of energy usage have been discussed in the previous \autoref{sec:resultsEnergy}, we will now look at the configurability of the selected simulators. In \autoref{tab:topologyParams}, we can see the different parameters through which a system topology is defined for each of the simulators. There, we can see that \textit{DISSECT-CF} offers the most parameters to be set by the user. While this makes the simulator highly customizable, it also means that it is more complex to define a topology. The other simulators offer relatively simple topology definitions, although there are also different degrees of customizability here. For \textit{CloudSim} and \textit{NetworkSim} a lot of policies such as VM schedulers or host allocation policies have to be defined for a simulation. Some simple policies are already provided and the user can also define their own. \textit{SimGrid} and \textit{OpenDC} provide the most simplistic ways of definiting the system topology, through XML and JSON files, respectively. \textit{SimGrid} does also provide the possibility of defining systems in code. The manner through which \textit{CloudSim}, \textit{NetworkCloudSim}, \textit{DISSECT-CF} and \textit{SimGrid} define the host's CPU speed is also notable, as the use variations of the Instruction Per Cycle metric which is not just dependent on the hardware system, but also on factors such as the operating system and the application(s) being run \cite{patterson_parallelism_2013}. This is not a constant value and must be measured for each specific context and, while it may lead to more accurate results, it is also more complex to obtain.
+
+The workload definition of each simulator is described in \autoref{tab:workloadParams}. As mentioned in \autoref{sec:simTestingExecution}, \textit{CloudSim} does provide functions for loading swf traces, this functionality is flawed as it disregards the \textit{submit time} field, thereby causing all jobs to be submitted at the very start of the simulation. \textit{DISSECT-CF}s trace reader is more functional and can take multiple trace formats. \textit{OpenDC} instead works with two parquet files per workload. One to define the jobs on a higher level and one to provide CPU usage snapshots. This is more suited towards microservice applications, as we can treat the services as jobs to be defined in the file with higher abstraction and give CPU utilization periodically in the other file. Memory utilization is only defined on a job-level and not over time, however, making it less precise in that regard. Furthermore, for \textit{OpenDC}, workloads cannot be defined in code. For \textit{SimGrid}, workloads can be defined in code, meaning that trace loading capabilities have to be implemented by the user themselves. It does also have functions for loading DAX\footnote{\url{https://pegasus.isi.edu/documentation/development/schemas.html}} or DOT files, but only in the context of Directed Acyclic Graphs (DAGs), which is not relevant to microservice systems. Workloads in \textit{SimGrid} only consist of computation duration, memory consumption or message size, with each consumption having to be defined separately. \textit{CloudSim}, \textit{NetworkCloudSim} and \textit{DISSECT-CF} may seem similar in their workload definitions, but are fundamentally different. \textit{DISSECT-CF} is a discrete simulator, meaning that the time unit it simulates is user-defined, as the simulator itself works with \textit{ticks}. Furthermore, the concept of communication employed by \textit{DISSECT-CF} is different from that of the other simulators that offer communication features, as \textit{DISSECT-CF} treats communication only as resource consumption and not messages being passed back and forth.
+
+\subsubsection{RQ2.1 Ease of Use}
+\subsubsubsection{Simulation Process}
+Out of the tested simulators, only \textit{OpenDC} has a GUI, in the form of a web application\footnote{\url{https://opendc.org/projects}}. This GUI is very limited however, as it only gives the user the opportunity to choose from predefined topology elements such as CPU, GPU, memory, etc. Furthermore, only one predefined workload can be simulated. This makes the GUI unsuitable to simulating microservice systems. While \textit{CloudSim} does not provide a GUI itself, there are a number of simulators built on the \textit{CloudSim} engine that do such as \textit{CloudReports} \cite{teixeira_sa_cloudreports_2014} and \textit{CloudAnalyst} \cite{wickremasinghe_cloudanalyst_2010}.
+
+For all five simulators, it is possible to retrieve the consumed energy with a user-defined frequency (e.g. every second). For \textit{CloudSim} and \textit{NetworkCloudSim}, the power consumption per host and per datacenter is logged, and the total consumed energy in Joules is written to a csv file.  The sample frequency is given in seconds, meaning that the maximum sampling frequency is one second. Terminal outputs and logs are largely user-defined (see \autoref{fig:scCloudsim}). For \textit{DISSECT-CF}, the user has to implements energy monitoring with using given \verb|EnergyMeter| classes. As \textit{DISSECT-CF} is an discrete event simulator, its time granularity is user-defined. Terminal outputs and logs are also largely user-defined (see \autoref{fig:scDissectCF}). \textit{OpenDC} writes the power consumption in W of hosts to parquet files with a maximum sampling frequency of one second. The terminal output, on the other hand, is very limited (see \autoref{fig:scOpenDC}). Finally, for \textit{SimGrid}, total energy consumption per host can be retrieved, but this has to be implemented by the user themselves in code (for example terminal output see \autoref{fig:scSimGrid}).
+
+\subsubsubsection{Documentation}
+As indicated above, \textit{CloudSim} is a very widely used cloud simulator and therefore has a relatively wide range of documentation and examples available. The documentation provided in the \textit{CloudSim} distribution is generally up to date but not very descriptive, for example lacking units of variables in the in-code documentation such as storage size or bandwidth. The same is the case for \textit{NetworkCloudSim}. For the power and network capabilities of \textit{CloudSim}, the documentation is less extensive. Documentation of \textit{DISSECT-CF} is quite little, but an accompanying repository with examples\footnote{\url{https://github.com/kecskemeti/dissect-cf-examples}} is available that was also used to implement the simulations for this study. Next to in-code documentation, both \textit{OpenDC}\footnote{\url{https://atlarge-research.github.io/opendc/docs/intro}} and \textit{SimGrid}\footnote{\url{https://simgrid.org/doc/latest}} have external documentation available. Both are very clear and thorough, but \textit{SimGrid's} is significantly more extensive and up-to-date. For all five discussed simulators, some form of documentation is available and minimally sufficient, although the lack of clear and extensive documentation of \textit{DISSECT-CF} could increase the steepness of its learning curve.
+
+\begin{table}[htbp]
+\centering
+\caption{Simulation time statistics for the selected simulators in seconds.}
+\label{tab:runtimes}
+\begin{tabular}{l|rrrrr}
+\textbf{Simulator} & \textbf{Mean} & \textbf{Median} & \textbf{Std} & \textbf{Min} & \textbf{Max} \\ \hline
+CloudSim                   & 3.14   & 3.13 & 0.58   & 2.24 & 4.17   \\
+DISSECT-CF                 & 2.75   & 2.75 & 0.09   & 2.42 & 3.15   \\
+NetworkCloudSim            & 3.70   & 3.71 & 1.00   & 2.39 & 5.15   \\
+OpenDC                     & 0.50   & 0.50 & 0.01   & 0.47 & 0.54   \\
+SimGrid                    & 0.05   & 0.04 & 0.03   & 0.01 & 0.16   \\
+SimGrid with comm.         & 0.67   & 0.26 & 0.73   & 0.07 & 2.35   \\
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.6\linewidth]{vu-cs-research-thesis/figures/runtimes-1.pdf}
+    \caption{Combination of a box- and jitter-plot of the simulation times in seconds of the simulated workloads for the different simulators.}
+    % \Description{Combination of a box- and jitter-plot of the simulation times in seconds of the simulated workloads for the different simulators.}
+    \label{fig:runtimes}
+\end{figure}
+
+\subsubsubsection{Simulation Time}
+As can be seen in \autoref{tab:runtimes} and \autoref{fig:runtimes}, \textit{NetworkCloudSim}, \textit{CloudSim} and \textit{DISSECT-CF} have similar mean run times between 2.75 and 3.75 seconds, with \textit{DISSECT-CF} being the more consistent. The mean simulation times for these simulators stay below 4 seconds on average, making these simulators well-suited to simulating small to medium-sized microservice applications. \textit{OpenDC} and \textit{SimGrid} with and without communication occupy the next bracket with mean run times between 0.05 and 0.67 seconds, allowing larger microservice applications to be simulated. 
+
+One notable observation is that when communication is simulated, it can have a significant impact on runtime. This is the case for both \textit{SimGrid} with communication and \textit{NetworkCloudSim}. In the case of \textit{NetworkCloudSim} two distinct groups can be seen in \autoref{fig:runtimes}; this would be the distinction between the two services simulated, as Train Ticket has more services than Sock Shop. A similar division is seen in the \textit{CloudSim} results, but with a smaller difference, indicating this is not solely a product of simulating networks. \textit{SimGrid} with communication also displays grouping behaviour but has a larger number of groups, with the majority of cases still having a runtime similar to the base SimGrid run. In contrast with the CloudSim design, this is a product of simulating more users. As users increase CloudSim with communication displays a larger difference between groups, this phenomenon is present for both simulated services. As this behavior is not present in the base SimGrid design, it can be concluded that this is a product of simulating network communication. This indicates that choosing the best simulator in terms of runtime can depend largely on the simulation target; number of users, microservices, and the presence of network simulation can all influence the runtime of most simulators. However, in general, OpenDC remains the most consistent in terms of runtime across these factors.
+
+
+% \textit{CloudSim} & 2.80 & 2.78 & 0.50 & 2.10 & 6.90 \\
+% \textit{DISSECT-CF} & 3.63 & 3.42 & 0.91 & 2.25 & 8.11 \\
+% \textit{NetworkCloudSim} & 3.23 & 3.01 & 0.71 & 2.23 & 8.14 \\
+% \textit{OpenDC} & 0.49 & 0.48 & 0.04 & 0.43 & 0.59 \\
+% \textit{SimGrid} & 0.04 & 0.05 & 0.02 & 0.01 & 0.14 \\

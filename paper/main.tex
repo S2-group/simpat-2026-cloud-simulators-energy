@@ -1,0 +1,145 @@
+% \documentclass[sigconf,screen,9pt]{acmart}
+
+\documentclass[preprint,3p,a4paper]{elsarticle} 
+
+
+% Flag to disable all editing macros and make the document ready for
+%  submission.
+\newif\ifEditMode
+
+% Editing mode.
+\EditModetrue
+% % Submission mode.
+% % The `submission' mode merges certain comments and edits, and removes some
+% % other notes, TODOs and remarks. For more details, refer to the `reviewing
+% % macros' in the `vusec.sty' file.
+% \EditModefalse
+
+
+\usepackage{vu}
+\usepackage{frontmatter}
+\usepackage{aliases}
+\usepackage{tablefootnote}
+\usepackage{caption}
+\usepackage{colortbl}
+\usepackage{pifont}
+\usepackage{longtable}
+\usepackage{etoolbox}
+\usepackage{tabularx}
+\usepackage{array}
+
+\newcommand\added[1]{\textcolor{black}{#1}}
+\newcommand\rone[1]{\textcolor{cyan}{#1}}
+\newcommand\rtwo[1]{\textcolor{orange}{#1}}
+
+% Make sure table captions remain at the normal size
+\captionsetup[table]{font=normalsize}
+
+% Make all tables use footnotesize text
+\AtBeginEnvironment{tabular}{\footnotesize}
+\AtBeginEnvironment{tabularx}{\footnotesize}
+\AtBeginEnvironment{longtable}{\footnotesize}
+
+\begin{document}
+
+
+%% Thesis title.
+\newcommand{\thesistitle}{A Comparative Study on the Suitability of Cloud Simulators for Estimating \rone{Host-Level} Energy Usage of \rone{Microservice Systems}}
+
+\newcommand{\no}{\textcolor{red}{{\large \ding{55}}}}
+\definecolor{forestgreen}{HTML}{2E6F40}
+\newcommand{\yes}{\textcolor{forestgreen}{{\large \ding{51}}}}
+
+\newcommand{\subsubsubsection}[1]{\textbf{#1}}
+
+%% Author information.
+%% (Used in a couple of places, so it's better to define them in one place.)
+% \newcommand{\thauthor}{Meret Baumgartner}
+% \newcommand{\thauthorid}{mba104}
+% \newcommand{\thauthoremail}{m.s.baumgartner@student.vu.nl}
+% \newcommand{\thauthoraff}{Vrije Universiteit Amsterdam}
+
+
+%% Thesis type.
+%% Valid values are `vubachelor', `csmaster', `pdcsmaster', and `litstudy'.
+%%
+% \thtype{csmaster}
+
+%% Thesis title.
+\thtitle{\thesistitle}
+
+%% Paper/thesis author.
+\thauthname{\thauthor}
+
+%% First supervisor.
+% \thsvfirst{First supervisor's name}{First supervisor's title}
+
+%% Daily supervisor.
+% \thsvdaily{Daily supervisor's name}{Daily supervisor's title}
+
+%% Second reader.
+% \thrdrsecond{Second reader's name}{Second reader's title}
+
+%% Attach customize front matter.
+% \addfrontmatter{}
+
+
+\title{\thesistitle}
+
+% \author{\thauthor}
+% \affiliation{
+%   \institution{\thauthoraff}
+%   \city{Amsterdam}
+%   \country{The Netherlands}
+% }
+% \email{\thauthoremail}
+
+\author{Meret Baumgartner}
+\ead{m.s.baumgartner@student.vu.nl}
+\address{Vrije Universiteit Amsterdam, the Netherlands}
+
+\author{Max Karsten}
+\ead{m.h2.karsten@student.vu.nl}
+\address{Vrije Universiteit Amsterdam, the Netherlands}
+
+\author{Ivano Malavolta}
+\ead{i.malavolta@vu.nl}
+\address{Vrije Universiteit Amsterdam, the Netherlands}
+
+
+\begin{abstract}
+\input{sections/abstract}
+\end{abstract}
+
+\maketitle
+
+% Remove ACM SIGCONF running headers.
+% \pagestyle{plain}
+% \pagenumbering{arabic}
+
+\input{sections/intro}
+\input{sections/background}
+\input{sections/related}
+\input{sections/goalAndRQs}
+\input{sections/experimentPlan}
+\input{sections/experimentExecution}
+\input{sections/results}
+\input{sections/discussion}
+\input{sections/threats}
+\input{sections/conclusion}
+
+\bibliographystyle{elsarticle-num}
+\bibliography{references}
+
+\onecolumn
+\newpage
+%\appendix
+\input{sections/appendix}
+
+\end{document}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

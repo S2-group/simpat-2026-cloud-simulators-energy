@@ -1,0 +1,14 @@
+\noindent \textit{Context}. With the promise of flexibility and scalability they provide, microservices have become widespread in industry and are often deployed in data centres, contributing to the cloud's large energy footprint. In order to reduce the energy usage of microservice systems and develop strategies to decrease resource consumption overall, simulation can be an important tool, but little research has been done into assessing cloud simulators' energy simulation capabilities in the context of \rone{microservice systems}.
+
+\noindent \textit{Goal}. In this study, we analyze and compare five cloud simulators in terms of their \rone{host-level} energy simulation capabilities as well as their suitability to simulating \rone{microservice systems}.
+
+\noindent \textit{Method}. We test the accuracy of the simulators by comparing their simulated \rone{host-level} energy usage values to collected real-world measures for two microservice applications across different scenarios and userloads. Furthermore, we systematically analyze the energy-related capabilities and user-related features of the simulators, such as customizability.
+
+\noindent \textit{Results}. 
+All five simulators take on average less than 4 seconds per simulation to run. \textit{SimGrid} is on average the fastest with a mean runtime of 0.05. 
+\textit{OpenDC} is the simulator that simulates the energy usage with the highest accuracy with a maximum mean relative error of 0.41 of the total energy usage, followed by \textit{SimGrid} at 0.42. 
+% \textit{CloudSim} and \textit{NetworkCloudSim} have the highest maximum mean error rat at 0.80 and 0.81 respectively. 
+From a user perspective OpenDC is the simplest to start using, while the \textit{DISSECT-CF} simulator is the most customizable and enables easy loading of workload traces. \textit{SimGrid} has the most extensive energy-related capabilities.
+
+\noindent \textit{Conclusions}. Our results show that, in general, \textit{OpenDC} is best suited for modelling \rone{host-level} energy consumption of microservice systems out of the selected simulators. For specific contexts, we have provided descriptions and properties of the simulators that can enable potential users to make informed decisions on what simulator to use for their circumstances.
+
