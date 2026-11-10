@@ -3,13 +3,13 @@
 \subsubsection{RQ1.1 Accuracy of Simulators} \label{sec:accuracy}
 In \autoref{tab:powermodelOverview}, we can see an overview of the mean relative error per power model for the selected simulators. There, we can see that \textit{OpenDC} consistently is most accurate across all tested power models. It is followed by \textit{CloudSim} for the cubic power model and then \textit{NetworkCloudSim} for the cubic and \textit{SimGrid} for the linear power model. In the table, we can see that the MRE for \textit{SimGrid} is the same for both workload definitions both with and without communication. Indeed, using the Mann-Whitney U test, we obtain a p-value of 1.0, which indicates that there is no evidence of a significant difference between the two workload definitions. By performing the test on the simulated values of \textit{CloudSim} and \textit{NetworkCloudSim}, we obtain a p-value of 0.31 indicating that there is not a significant difference between the results of these simulators. However, because in previous test runs the p-value reported as 0.0 the \textit{NetworkCloudSim} results were included for comparison. By performing the Kruskal–Wallis test on all five simulators, we obtain a p-value of again 0.0, indicating evidence of a significant different between the simulators.
 
-\begin{figure}[t]
+\begin{figure*}[t]
     \centering
-    \includegraphics[width=0.5\linewidth]{vu-cs-research-thesis/figures/double_cdf.pdf}
-    \caption{CDF diagrams for the total energy consumption simulated by the five simulators with their best-performing power models and the ground truth measures.}
-    % \Description{CDF diagrams for the total energy consumption simulated by the five simulators with their best-performing power models and the ground truth measures.}
+    \includegraphics[width=\textwidth]{vu-cs-research-thesis/figures/double_cdf_per_simulator.pdf}
+    \caption{CDF diagrams of the total energy consumption simulated by each simulator (columns) for Sock Shop and Train Ticket (rows) with their available power models and the ground truth measures. The shaded area around the ground truth shows its 95\% confidence band.}
+    % \Description{CDF diagrams of the total energy consumption simulated by each simulator (columns) for Sock Shop and Train Ticket (rows) with their available power models and the ground truth measures with 95 percent confidence band.}
     \label{fig:cdf}
-\end{figure}
+\end{figure*}
 
 \begin{table}[t]
 \centering
@@ -25,13 +25,13 @@ NetworkCloudSim     & 0.089 \\
 \end{tabular}
 \end{table}
 
-\begin{figure}[t]
+\begin{figure*}[t]
     \centering
-    \includegraphics[width=0.5\linewidth]{vu-cs-research-thesis/figures/mean_total_pwr.pdf}
-    \caption{Mean total energy consumption in Joules for each simulator's power model that is most accurate on average.}
-    % \Description{Mean total energy consumption in Joules for each simulator's power model that is most accurate on average.}
+    \includegraphics[width=\textwidth]{vu-cs-research-thesis/figures/mean_total_pwr_per_simulator.pdf}
+    \caption{Mean cumulative energy consumption over time in Joules, faceted per simulator (its power model that is most accurate on average), with the ground truth mean and its range over the four measured repetitions shaded.}
+    % \Description{Mean cumulative energy consumption over time in Joules, faceted per simulator with its most accurate power model, with the ground truth mean and its range over the four measured repetitions shaded.}
     \label{fig:bestOverTime}
-\end{figure}
+\end{figure*}
 
 Between \textit{CloudSim} and \textit{NetworkCloudSim}, the MRE seems to be very similar as well. As we can see in \autoref{fig:bestOverTime}, \textit{NetworkCloudSim} consistently produces slightly higher energy usage values than \textit{CloudSim}. It is also notable that in the same figure, we can see that both \textit{CloudSim} and \textit{NetworkCloudSim} overestimate the energy usage. For the linear power model, \textit{OpenDC} overestimates the energy usage, while it underestimates it for the other power models. \textit{DISSECT-CF} on the other hand underestimates in the constant model but overestimates in the linear model. Furthermore, we can see that at until about half-way through the measuring window, the \textit{OpenDC} with the non-constant models, \textit{SimGrid} and even \textit{DISSECT-CF} with the constant power model have a smaller error. As the total energy starts to increase more rapidly, \textit{OpenDC} with the constant power model becomes the most accurate.
 
@@ -41,13 +41,13 @@ In both \autoref{fig:cdf} and \autoref{fig:overtimes}, we can see that the degre
 
 % das hier ist kein echtes Problem, aber deine Formulierung, dass that the degree by which s.th. produces incorrect values is greater" ist ein bisschen komisch. Denn: du schreibst dass das incorrect is greater. ich würde erwarten, dass du schreibst dass die Fehler bei den anderen geringer sind. aber wenn es um diesen konkreten simulator gehen soll, dann ist deins sicher okay.
 
-\begin{figure*}[ht]
+\begin{sidewaysfigure}[ht]
     \centering
-    \includegraphics[width=0.95\linewidth]{vu-cs-research-thesis/figures/multi_image_fig-1.pdf}
-    \caption{Mean energy usage over time for different application-scenario-users combinations.}
-    % \Description{Mean energy usage over time for different application-scenario-users combinations.}
+    \includegraphics[height=0.76\textheight]{vu-cs-research-thesis/figures/overtimes_per_simulator.pdf}
+    \caption{Mean cumulative energy consumption over time for each simulator (one block of four subplot rows per simulator, with a Sock Shop and a Train Ticket row) across the application-scenario-users combinations, with the available power models per simulator and the ground truth mean (black) with its range over the four measured repetitions (shaded).}
+    % \Description{Mean cumulative energy consumption over time for each simulator one block per simulator across the application scenario users combinations with the available power models per simulator and the ground truth mean with its range shaded.}
     \label{fig:overtimes}
-\end{figure*}
+\end{sidewaysfigure}
 
 \begin{table*}[ht]
 \centering
@@ -149,9 +149,9 @@ SimGrid with comm.         & 0.67   & 0.26 & 0.73   & 0.07 & 2.35   \\
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.6\linewidth]{vu-cs-research-thesis/figures/runtimes-1.pdf}
-    \caption{Combination of a box- and jitter-plot of the simulation times in seconds of the simulated workloads for the different simulators.}
-    % \Description{Combination of a box- and jitter-plot of the simulation times in seconds of the simulated workloads for the different simulators.}
+    \includegraphics[width=0.95\linewidth]{vu-cs-research-thesis/figures/runtimes_revised.pdf}
+    \caption{Combination of a box- and jitter-plot of the simulation times in seconds of the simulated workloads for the different simulators ($n$ = number of simulation runs per simulator).}
+    % \Description{Combination of a box and jitter plot of the simulation times in seconds of the simulated workloads for the different simulators with sample sizes.}
     \label{fig:runtimes}
 \end{figure}
 
