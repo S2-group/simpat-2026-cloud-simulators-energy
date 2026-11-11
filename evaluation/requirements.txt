@@ -1,0 +1,12 @@
+# Dependencies for evaluation/get_stats.ipynb
+# (notebook kernel: Python 3.14.2; versions left unpinned as the repo does not pin any)
+numpy
+pandas
+scipy
+matplotlib
+seaborn
+rdata
+
+# To run the notebook itself
+ipykernel
+jupyterlab
