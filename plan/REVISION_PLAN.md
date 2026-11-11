@@ -34,20 +34,30 @@ Reviewer: documentation/adoption judged by one researcher; only 3 maintainers re
 
 ## R1.5 — Figures 6–7 overlap (assistant: graphs)
 
-Reviewer: overlapping curves, insufficient colour differentiation. Plan: one figure-set per simulator; power models as the within-plot dimension.
+Reviewer: overlapping curves, insufficient colour differentiation. Final layout
+(reworked after Max's feedback on readability):
 
-- Fig 7 (`fig:overtimes`, currently 2×4 treatment grid mixing 5 simulators): → 5 subfigures, one per simulator; internally 2×4 treatment grid with power models as hue/style; ground truth as black line.
-- Fig 6 (`fig:bestOverTime`): per-simulator panel or facet.
-- ☑ Assistant: `evaluation/analysis/gen_revised_figures.py` written + run; figures in
-  `paper/figures/` (PDF + PNG proof), visually verified:
-  `overtimes_per_simulator.{pdf,png}` (Fig 7 split per simulator, GT min–max band of the
-  4 reps, complete legend incl. `constant`, top column titles),
-  `mean_total_pwr_per_simulator.{pdf,png}` (Fig 6 faceted per simulator + GT band),
-  `double_cdf_per_simulator.{pdf,png}` (CDF per simulator + GT DKW 95% band),
-  `runtimes_revised.{pdf,png}` (box+jitter with n= per simulator; stats match
-  `evaluation/runtime/runtimes.csv`; OpenDC expanded per workload as in get_runtimes.py)
-- ☐ **Max** (writing): replace `\includegraphics` + captions in `results.tex`; note in response letter
-- Note: new figure files carry a `_revised`/`_per_simulator` suffix — nothing in the paper was overwritten.
+- Fig 6 (`fig:bestOverTime`): ONE figure, 5 panels stacked VERTICALLY (5×1, shared
+  axes; simulator + power model in each ylabel). 5-across was too wide to read.
+  Included with `height=0.88\textheight` (at `\textwidth` the tall stack overflows
+  the text height and LaTeX silently drops the float).
+- Fig 7 (`fig:overtimes`): split into TWO figures — one per experiment — as
+  subfigures (a) Sock Shop, (b) Train Ticket inside one `sidewaysfigure`, each
+  4 wide × 5 tall (20 panels, one row per simulator), `0.48\linewidth` each.
+- Fig 5 (`fig:cdf`): same density problem → same split into two full-width
+  subfigures (a) Sock Shop, (b) Train Ticket, 5 panels per row, GT with DKW 95% band.
+- Fig 8 (`fig:runtimes`): unchanged layout; n= sample sizes added.
+- ☑ Assistant: script `evaluation/analysis/gen_revised_figures.py` + figures in
+  `paper/figures/`: `mean_total_pwr_per_simulator.{pdf,png}`,
+  `overtimes_{sockshop,trainticket}_per_simulator.{pdf,png}`,
+  `cdf_{sockshop,trainticket}_per_simulator.{pdf,png}`,
+  `runtimes_revised.{pdf,png}`. All visually verified (panels, legends, bands,
+  no clipping); superseded `overtimes_per_simulator.*` and
+  `double_cdf_per_simulator.*` removed.
+- ☑ **Max-assisted writing**: `\includegraphics` swaps + captions in `results.tex`
+  (committed `f62b4d0`, `eb074e9`); check captions when copying to Overleaf.
+- Note for response letter: cite R1.5 split + R2.8 CI additions together (overlaps
+  R2.8, as the plan's R2.8 item already anticipates).
 
 ## R1.7 — Interpret Figure 9 in Discussion (assistant drafts, Max integrates)
 
