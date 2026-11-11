@@ -5,9 +5,23 @@ In \autoref{tab:powermodelOverview}, we can see an overview of the mean relative
 
 \begin{figure*}[t]
     \centering
-    \includegraphics[width=\textwidth]{vu-cs-research-thesis/figures/double_cdf_per_simulator.pdf}
-    \caption{CDF diagrams of the total energy consumption simulated by each simulator (columns) for Sock Shop and Train Ticket (rows) with their available power models and the ground truth measures. The shaded area around the ground truth shows its 95\% confidence band.}
-    % \Description{CDF diagrams of the total energy consumption simulated by each simulator (columns) for Sock Shop and Train Ticket (rows) with their available power models and the ground truth measures with 95 percent confidence band.}
+    \begin{subfigure}[t]{\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{vu-cs-research-thesis/figures/cdf_sockshop_per_simulator.pdf}
+        \caption{Sock Shop.}
+        \label{fig:cdf-sockshop}
+    \end{subfigure}
+
+    \vspace{0.4em}
+
+    \begin{subfigure}[t]{\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{vu-cs-research-thesis/figures/cdf_trainticket_per_simulator.pdf}
+        \caption{Train Ticket.}
+        \label{fig:cdf-trainticket}
+    \end{subfigure}
+    \caption{CDF diagrams of the total energy consumption simulated by each simulator (one panel per simulator) with their available power models and the ground truth measures. The shaded area around the ground truth shows its 95\% confidence band.}
+    % \Description{CDF diagrams of the total energy consumption simulated by each simulator one panel per simulator with their available power models and the ground truth measures with 95 percent confidence band for Sock Shop and Train Ticket.}
     \label{fig:cdf}
 \end{figure*}
 
@@ -27,7 +41,7 @@ NetworkCloudSim     & 0.089 \\
 
 \begin{figure*}[t]
     \centering
-    \includegraphics[width=\textwidth]{vu-cs-research-thesis/figures/mean_total_pwr_per_simulator.pdf}
+    \includegraphics[height=0.88\textheight]{vu-cs-research-thesis/figures/mean_total_pwr_per_simulator.pdf}
     \caption{Mean cumulative energy consumption over time in Joules, faceted per simulator (its power model that is most accurate on average), with the ground truth mean and its range over the four measured repetitions shaded.}
     % \Description{Mean cumulative energy consumption over time in Joules, faceted per simulator with its most accurate power model, with the ground truth mean and its range over the four measured repetitions shaded.}
     \label{fig:bestOverTime}
@@ -43,9 +57,21 @@ In both \autoref{fig:cdf} and \autoref{fig:overtimes}, we can see that the degre
 
 \begin{sidewaysfigure}[ht]
     \centering
-    \includegraphics[height=0.76\textheight]{vu-cs-research-thesis/figures/overtimes_per_simulator.pdf}
-    \caption{Mean cumulative energy consumption over time for each simulator (one block of four subplot rows per simulator, with a Sock Shop and a Train Ticket row) across the application-scenario-users combinations, with the available power models per simulator and the ground truth mean (black) with its range over the four measured repetitions (shaded).}
-    % \Description{Mean cumulative energy consumption over time for each simulator one block per simulator across the application scenario users combinations with the available power models per simulator and the ground truth mean with its range shaded.}
+    \begin{subfigure}[t]{0.48\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{vu-cs-research-thesis/figures/overtimes_sockshop_per_simulator.pdf}
+        \caption{Sock Shop.}
+        \label{fig:overtimes-sockshop}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.48\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{vu-cs-research-thesis/figures/overtimes_trainticket_per_simulator.pdf}
+        \caption{Train Ticket.}
+        \label{fig:overtimes-trainticket}
+    \end{subfigure}
+    \caption{Mean cumulative energy consumption over time for each simulator (one subplot row per simulator) across the application-scenario-users combinations, with the available power models per simulator and the ground truth mean (black) with its range over the four measured repetitions (shaded).}
+    % \Description{Mean cumulative energy consumption over time for each simulator one subplot row per simulator across the application scenario users combinations with the available power models per simulator and the ground truth mean with its range shaded for Sock Shop and Train Ticket.}
     \label{fig:overtimes}
 \end{sidewaysfigure}
 
