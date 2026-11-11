@@ -5,23 +5,9 @@ In \autoref{tab:powermodelOverview}, we can see an overview of the mean relative
 
 \begin{figure*}[t]
     \centering
-    \begin{subfigure}[t]{\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{vu-cs-research-thesis/figures/cdf_sockshop_per_simulator.pdf}
-        \caption{Sock Shop.}
-        \label{fig:cdf-sockshop}
-    \end{subfigure}
-
-    \vspace{0.4em}
-
-    \begin{subfigure}[t]{\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{vu-cs-research-thesis/figures/cdf_trainticket_per_simulator.pdf}
-        \caption{Train Ticket.}
-        \label{fig:cdf-trainticket}
-    \end{subfigure}
-    \caption{CDF diagrams of the total energy consumption simulated by each simulator (one panel per simulator) with their available power models and the ground truth measures. The shaded area around the ground truth shows its 95\% confidence band.}
-    % \Description{CDF diagrams of the total energy consumption simulated by each simulator one panel per simulator with their available power models and the ground truth measures with 95 percent confidence band for Sock Shop and Train Ticket.}
+    \includegraphics[width=\textwidth]{vu-cs-research-thesis/figures/cdf_per_simulator.pdf}
+    \caption{\rone{Cumulative distribution functions (CDFs) of the total energy consumption, with one panel per simulator (columns) and microservice application (rows) and one curve per available power model.} \rtwo{Each simulator curve is built from the 16 simulated traces of an application (each the mean of 30 simulation runs), the ground truth (black) from the corresponding 16 selected measured repetitions. The shaded area is the 95\% Dvoretzky--Kiefer--Wolfowitz (DKW) confidence band of the ground-truth CDF ($\pm 0.34$ for $n = 16$).}}
+    % \Description{CDFs of the total energy consumption per simulator and application, with one curve per power model and the ground truth with its 95 percent DKW confidence band.}
     \label{fig:cdf}
 \end{figure*}
 
@@ -41,9 +27,9 @@ NetworkCloudSim     & 0.089 \\
 
 \begin{figure*}[t]
     \centering
-    \includegraphics[height=0.88\textheight]{vu-cs-research-thesis/figures/mean_total_pwr_per_simulator.pdf}
-    \caption{Mean cumulative energy consumption over time in Joules, faceted per simulator (its power model that is most accurate on average), with the ground truth mean and its range over the four measured repetitions shaded.}
-    % \Description{Mean cumulative energy consumption over time in Joules, faceted per simulator with its most accurate power model, with the ground truth mean and its range over the four measured repetitions shaded.}
+    \includegraphics[width=0.92\textwidth]{vu-cs-research-thesis/figures/mean_total_pwr_per_simulator.pdf}
+    \caption{\rone{Mean cumulative energy consumption over time, with one panel per simulator using its power model that is most accurate on average, averaged over all eight application--scenario--user-load treatments.} \rtwo{Shaded areas indicate variability, averaged over the treatments: for the ground truth (grey), the 10th--90th percentile over all 30 measured repetitions of each treatment; for the simulators (colour), the minimum--maximum over the four simulated traces of each treatment.}}
+    % \Description{Mean cumulative energy consumption over time per simulator with its most accurate power model and the ground truth, with variability bands.}
     \label{fig:bestOverTime}
 \end{figure*}
 
@@ -55,25 +41,13 @@ In both \autoref{fig:cdf} and \autoref{fig:overtimes}, we can see that the degre
 
 % das hier ist kein echtes Problem, aber deine Formulierung, dass that the degree by which s.th. produces incorrect values is greater" ist ein bisschen komisch. Denn: du schreibst dass das incorrect is greater. ich würde erwarten, dass du schreibst dass die Fehler bei den anderen geringer sind. aber wenn es um diesen konkreten simulator gehen soll, dann ist deins sicher okay.
 
-\begin{sidewaysfigure}[ht]
+\begin{figure*}[t]
     \centering
-    \begin{subfigure}[t]{0.48\linewidth}
-        \centering
-        \includegraphics[width=\linewidth]{vu-cs-research-thesis/figures/overtimes_sockshop_per_simulator.pdf}
-        \caption{Sock Shop.}
-        \label{fig:overtimes-sockshop}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[t]{0.48\linewidth}
-        \centering
-        \includegraphics[width=\linewidth]{vu-cs-research-thesis/figures/overtimes_trainticket_per_simulator.pdf}
-        \caption{Train Ticket.}
-        \label{fig:overtimes-trainticket}
-    \end{subfigure}
-    \caption{Mean cumulative energy consumption over time for each simulator (one subplot row per simulator) across the application-scenario-users combinations, with the available power models per simulator and the ground truth mean (black) with its range over the four measured repetitions (shaded).}
-    % \Description{Mean cumulative energy consumption over time for each simulator one subplot row per simulator across the application scenario users combinations with the available power models per simulator and the ground truth mean with its range shaded for Sock Shop and Train Ticket.}
+    \includegraphics[width=\textwidth]{vu-cs-research-thesis/figures/overtimes_per_simulator.pdf}
+    \caption{\rone{Mean cumulative energy consumption over time per simulator (rows) and treatment (columns: scenario $\cdot$ number of users, grouped per application), with one curve per available power model and the ground truth in black.} \rtwo{The ground-truth curve is the mean of the four selected repetitions; the grey band is the 10th--90th percentile over all 30 measured repetitions of the treatment. Coloured bands show the minimum--maximum over the four simulated traces (each the mean of 30 simulation runs); they are narrow because the simulators are near-deterministic for a given trace (\autoref{tab:deterministic}).}}
+    % \Description{Mean cumulative energy consumption over time per simulator and treatment, with one curve per power model, the ground truth, and variability bands.}
     \label{fig:overtimes}
-\end{sidewaysfigure}
+\end{figure*}
 
 \begin{table*}[ht]
 \centering
@@ -112,16 +86,21 @@ In terms of host energy usage simulation, \textit{OpenDC} has both the highest a
 \begin{tabular}{ll|lllll}
 \textbf{Resource} & \textbf{Property} & \textbf{CloudSim} & \textbf{DISSECT-CF} & \textbf{NetworkCloudSim} & \textbf{OpenDC} & \textbf{SimGrid} \\ \hline
 \multirow{4}{*}{Host} & CPU speed & MIPS & instructions per tick & MIPS & MHz & FLOPS \\
- & Memory & bytes & bytes & bytes & bytes & \no \\
- & Network bandwidth & B/s & bytes & B/s & \no & \no \\
+ & Memory & \rone{MB} & bytes & \rone{MB} & \rone{MiB} & \no \\
+ & Network bandwidth & \rone{bit/s} & \rone{bytes/tick} & \rone{bit/s} & \no & \no \\
  & Network latency & \no & \no & \no & \no & \no \\ \arrayrulecolor{lightgray}\hline
-\multirow{3}{*}{ Storage} & Size & \no & MB & \no & \no & \no \\
- & Network bandwidth & \no & B/s & \no & \no & \no \\
- & Disk bandwidth & \no & B/s & \no & \no & \no \\ \arrayrulecolor{lightgray} \hline 
-\multirow{2}{*}{Network link} & Bandwidth & \no & B/s & B/s & \no & bps \\
- & Latency & \no & ticks & seconds & \no & ms \\ \arrayrulecolor{black} \hline
+\multirow{3}{*}{ Storage} & Size & \rone{MB$^{a}$} & \rone{bytes} & \rone{MB$^{a}$} & \no & \no \\
+ & Network bandwidth & \yes\rone{$^{a}$} & \rone{bytes/tick} & \yes\rone{$^{a}$} & \no & \no \\
+ & Disk bandwidth & \rone{MB/s$^{a}$} & \rone{bytes/tick} & \rone{MB/s$^{a}$} & \no & \rone{B/s, bit/s$^{c}$} \\ \arrayrulecolor{lightgray} \hline
+\multirow{2}{*}{Network link} & Bandwidth & \no\rone{$^{b}$} & \rone{bytes/tick$^{d}$} & \rone{bit/s} & \no & \rone{B/s, bit/s$^{c}$} \\
+ & Latency & \rone{seconds} & ticks & seconds & \no & \rone{s, ms, \ldots$^{c}$} \\ \arrayrulecolor{black} \hline
 \multicolumn{2}{l|}{ Definition method} & in code & in code & in code & JSON & XML \& in code
 \end{tabular}
+
+\smallskip
+\begin{minipage}{\textwidth}
+\footnotesize \rone{$^{a}$Storage devices (\texttt{HarddriveStorage}, \texttt{SanStorage}) are attached at datacenter level, not per host; the \texttt{SanStorage} network bandwidth unit is undocumented. $^{b}$A link bandwidth is accepted by \texttt{NetworkTopology} but not used during simulation. $^{c}$The unit must be stated explicitly in the platform description. $^{d}$There are no explicit links; bandwidth is set as input/output bandwidth per network node.}
+\end{minipage}
 \end{table*}
 
 \begin{table*}[htbp]
@@ -175,8 +154,8 @@ SimGrid with comm.         & 0.67   & 0.26 & 0.73   & 0.07 & 2.35   \\
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.95\linewidth]{vu-cs-research-thesis/figures/runtimes_revised.pdf}
-    \caption{Combination of a box- and jitter-plot of the simulation times in seconds of the simulated workloads for the different simulators ($n$ = number of simulation runs per simulator).}
+    \includegraphics[width=\textwidth]{vu-cs-research-thesis/figures/runtimes_revised.pdf}
+    \caption{Simulation time per simulated workload for each simulator. \rtwo{Boxes show the median and quartiles, whiskers extend to 1.5 times the interquartile range, and dots show the individual simulation runs ($n$ = number of runs per simulator).}}
     % \Description{Combination of a box and jitter plot of the simulation times in seconds of the simulated workloads for the different simulators with sample sizes.}
     \label{fig:runtimes}
 \end{figure}

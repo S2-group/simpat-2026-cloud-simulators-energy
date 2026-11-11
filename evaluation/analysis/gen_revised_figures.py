@@ -1,51 +1,43 @@
 #!/usr/bin/env python3
 """
-Revised figures for the revision (responds to R1.5 and R2.8).
+Revised result figures for the revision (R1.5: split per simulator; R2.8: variability
+indication, clear legends, consistent terminology).
 
-R1.5: Figures with overlapping curves are split per simulator; power models become
-      the within-plot dimension.
-R2.8: confidence/variability indication everywhere + consistent terminology.
+Figures (PDF for the paper + PNG preview, written to paper/figures/):
 
-Figures generated (PDF for the paper, PNG previews next to them):
+  cdf_per_simulator.pdf            fig:cdf          2 x 5 small multiples (system x simulator)
+  mean_total_pwr_per_simulator.pdf fig:bestOverTime 5 x 1 (one panel per simulator)
+  overtimes_per_simulator.pdf      fig:overtimes    5 x 8 small multiples (simulator x treatment)
+  runtimes_revised.pdf             fig:runtimes     box + jitter per simulator, n per group
 
-1. overtimes_per_simulator.pdf
-   One subfigure per simulator (5 in a vertical stack), each showing the
-   2 x 4 application-scenario-users grids (mean cumulative energy over time) with
-   power models as hue/style. Ground truth drawn as black line with a band spanning
-   the min..max total energy of the 4 selected ground-truth repetitions (R2.8).
+Variability indication (R2.8) -- chosen per figure:
+  * Simulators: min-max range over the 4 simulated traces of a treatment (each trace's
+    value is the mean of its 30 runs; simulators are near-deterministic per trace, so
+    the full range is the most transparent summary).
+  * Ground truth over time: the line is the mean of the 4 selected repetitions (what the
+    simulators are compared against); the band is the 10th-90th percentile over ALL 30
+    measured repetitions of the treatment. The 4 selected repetitions were chosen as the
+    ones closest to the median energy, so their own min-max range (6-97 J) understates
+    the real run-to-run variability (P10-P90 width 259-552 J). Curves for all 30
+    repetitions are rebuilt from the raw metrics with the paper's trapezoid rule
+    (identical to evaluation/energy/*.energy for the selected ones).
+  * Ground-truth CDF: DKW simultaneous 95% confidence band, n = 16 per system
+    (4 treatments x 4 selected repetitions).
+  * Runtimes: box (quartiles) + whiskers + individual runs; n per simulator.
 
-2. double_cdf_per_simulator.pdf
-   Per system (Sock Shop / Train Ticket) a row of 5 small CDF subplots, one per
-   simulator (power models as curves), ground truth black. DKW simultaneous
-   confidence bands (alpha=0.05) around the ground-truth CDF (R2.8). Simulator curves
-   are 30-run means per repetition, so no band besides GT.
-
-3. cdf_best_per_simulator.pdf   (revision of `double_cdf.pdf`, fig:cdf)
-   Previously: one plot per system with all simulators. Now: same layout but one
-   subplot per simulator (best power model only) + GT with DKW band.
-
-4. mean_total_pwr_per_simulator.pdf   (revision of `mean_total_pwr.pdf`, fig:bestOverTime)
-   Faceted by simulator (best power model), GT band from the 4 repetitions.
-
-5. runtimes_revised.pdf   (revision of `runtimes-1.pdf`, fig:runtimes)
-   Box + jitter (as before) with a legend naming each simulator's sample size n
-   (R2.8: explicit variability indication). Data from evaluation/runtime/runtimes.csv.
-
-Terminology used consistently (R2.8):
-  x of over-time figures: "time (s)"
-  y of over-time figures: "cumulative energy consumption (J)"
-  CDF x: "total energy consumption (J)", y: "CDF"
-  runtime y: "simulation time (s)"
+Terminology: "time (s)", "cumulative energy consumption (J)",
+"total energy consumption (J)", "simulation time (s)".
 
 Usage:
     .venv/bin/python evaluation/analysis/gen_revised_figures.py [which ...]
-    `which` in {overtimes, fig6, cdf, runtimes} (default: all)
-Outputs written to paper/figures/ with a `_revised` suffix (nothing overwritten).
+    which in {cdf, fig6, overtimes, runtimes} (default: all)
 """
 
 from __future__ import annotations
 
+import glob
 import json
+import re
 import sys
 from itertools import product
 from pathlib import Path
@@ -55,41 +47,62 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from matplotlib.gridspec import GridSpec
 
 ROOT = Path(__file__).resolve().parents[2]
-ENERGY_DIR = ROOT / "evaluation" / "energy"
-GT_DIR = (
-    ROOT / "evaluation" / "energy"
-)  # selected GT traces live as {system}/{scenario}/{users}/{rep}.energy
-RUNTIMES_CSV = ROOT / "evaluation" / "runtime" / "runtimes.csv"
+ENERGY_DIR = ROOT / "evaluation" / "energy"   # sims: {sim}.energy; GT: {system}/{scenario}/{users}/{rep}.energy
+RAW_GT_DIR = ROOT / "ground-truth" / "vuDevOps" / "data_collection"
 OUT_DIR = ROOT / "paper" / "figures"
 
 SIMULATORS = ["cloudsim", "networkcloudsim", "dissectcf", "opendc", "simgrid"]
-#Pretty names in paper style
-PRETTY = {
-    "cloudsim": "CloudSim",
-    "networkcloudsim": "NetworkCloudSim",
-    "dissectcf": "DISSECT-CF",
-    "opendc": "OpenDC",
-    "simgrid": "SimGrid",
-}
-POWER_MODELS = ["constant", "linear", "square", "sqrt", "cubic"]
-PM_STYLE = {  # dash cycle + colour cycle shared across figures
+PRETTY = {"cloudsim": "CloudSim", "networkcloudsim": "NetworkCloudSim",
+          "dissectcf": "DISSECT-CF", "opendc": "OpenDC", "simgrid": "SimGrid"}
+ROW_LABEL = {**PRETTY, "networkcloudsim": "Network-\nCloudSim"}
+SYS_PRETTY = {"sockshop": "Sock Shop", "trainticket": "Train Ticket"}
+BEST_PM = {"cloudsim": "cubic", "networkcloudsim": "cubic", "dissectcf": "constant",
+           "opendc": "constant", "simgrid": "linear"}
+PM_ORDER = ["constant", "linear", "cubic", "square", "sqrt"]
+PM_STYLE = {  # colour + dash pattern shared by every figure
     "constant": dict(color="tab:blue", linestyle="-"),
     "linear": dict(color="tab:orange", linestyle="--"),
     "cubic": dict(color="tab:green", linestyle="-."),
     "square": dict(color="tab:red", linestyle=":"),
     "sqrt": dict(color="tab:purple", linestyle=(0, (3, 1, 1, 1))),
 }
-TREATMENTS = list(product(["sockshop", "trainticket"], ["A", "B"], [100, 1000]))
+SYSTEMS = ["sockshop", "trainticket"]
+SCEN_USERS = list(product(["A", "B"], [100, 1000]))
+TREATMENTS = [(s, sc, u) for s in SYSTEMS for sc, u in SCEN_USERS]
 T_END = 300.0
-GT_LABEL = "ground truth"
+GRID = np.arange(5.0, T_END + 1, 5.0)          # GT sampling grid (5 s)
 
-plt.rcParams.update({"font.size": 9, "axes.titlesize": 9, "legend.fontsize": 7})
+TEXTWIDTH_IN = 6.5                              # elsarticle 3p \textwidth = 468 pt
+SIM_LW, GT_LW = 1.6, 1.3
+SIM_BAND_ALPHA, GT_BAND_ALPHA = 0.18, 0.22
+GT_LABEL = "ground truth (mean of 4 selected reps)"
+GT_BAND_LABEL = "ground truth P10–P90 (all 30 reps)"
+SIM_BAND_LABEL = "simulator min–max (4 traces)"
+
+plt.rcParams.update({
+    "font.size": 7, "axes.titlesize": 7.5, "axes.labelsize": 7.5,
+    "xtick.labelsize": 6.5, "ytick.labelsize": 6.5,
+    "legend.fontsize": 7, "legend.title_fontsize": 7.5,
+    "axes.linewidth": 0.6, "xtick.major.width": 0.5, "ytick.major.width": 0.5,
+    "xtick.major.size": 2, "ytick.major.size": 2,
+    "axes.grid": True, "grid.linewidth": 0.4, "grid.color": "0.88",
+})
+
+# Label hierarchy (same in every figure):
+#   outer axis labels  9 pt bold       e.g. "time (s)"
+#   group headers      8.5 pt bold     e.g. "Sock Shop" (with a rule underneath)
+#   panel labels       7.5 pt  (simulator / treatment / application)
+#   tick labels        6.5 pt
+OUTER = dict(fontsize=9, fontweight="bold")
+GROUP = dict(fontsize=8.5, fontweight="bold")
+STRIP = dict(fontsize=7.5)
 
 
 # --------------------------------------------------------------------------- #
-# Data loading helpers
+# Data helpers
 # --------------------------------------------------------------------------- #
 _SIM_CACHE: dict[str, pd.DataFrame] = {}
 
@@ -97,294 +110,248 @@ _SIM_CACHE: dict[str, pd.DataFrame] = {}
 def sim_df(simulator: str) -> pd.DataFrame:
     if simulator not in _SIM_CACHE:
         df = pd.read_csv(ENERGY_DIR / f"{simulator}.energy")
-        _SIM_CACHE[simulator] = df[df["time"] <= T_END]
+        df = df[df["time"] <= T_END].copy()
+        df["time"] = df["time"].round(2)
+        _SIM_CACHE[simulator] = df
     return _SIM_CACHE[simulator]
 
 
-def gt_traces(system: str, scenario: str, users: int) -> dict[int, pd.DataFrame]:
-    """The 4 selected ground-truth traces of a treatment: rep -> df(time, joules_total)."""
-    out = {}
-    base = GT_DIR / system / scenario / str(users)
-    for f in sorted(base.glob("*.energy")):
-        out[int(f.stem)] = pd.read_csv(f)
-    return out
+def sim_band(sim: str, system: str, scenario: str, users: int) -> pd.DataFrame:
+    """Per (powermodel, time): mean / min / max over the 4 simulated traces.
 
-
-def gt_mean_curve(system: str, scenario: str, users: int) -> pd.DataFrame:
-    """Mean cumulative energy over the 4 selected GT reps, joined on time."""
-    traces = gt_traces(system, scenario, users)
-    if not traces:
-        raise FileNotFoundError(f"no GT traces for {system}/{scenario}/{users}")
-    ref = next(iter(traces.values()))[["time"]].sort_values("time")
-    cur = ref.copy()
-    for rep, df in traces.items():
-        cur = cur.merge(df[["time", "joules_total"]].rename(
-            columns={"joules_total": f"r{rep}"}), on="time", how="inner")
-    reps = [c for c in cur.columns if c.startswith("r")]
-    cur["mean"] = cur[reps].mean(axis=1)
-    cur["min"] = cur[reps].min(axis=1)
-    cur["max"] = cur[reps].max(axis=1)
-    return cur
-
-
-def sim_curves(simulator: str, system: str, scenario: str, users: int) -> pd.DataFrame:
-    """Mean cumulative energy per (powermodel, time) for one treatment."""
-    df = sim_df(simulator)
+    Each trace's curve is first averaged over its 30 simulation runs.
+    """
+    df = sim_df(sim)
     sub = df[(df["test_system"] == system) & (df["scenario"] == scenario)
              & (df["users"] == users)]
-    return sub.groupby(["powermodel", "time"], as_index=False)["joules_total"].mean()
+    per_trace = (sub.groupby(["powermodel", "repetition", "time"])["joules_total"]
+                 .mean().reset_index())
+    return (per_trace.groupby(["powermodel", "time"])["joules_total"]
+            .agg(["mean", "min", "max"]).reset_index())
 
 
-def dkw_band(n: int, alpha: float = 0.05) -> tuple[float, float]:
-    """Half-widths of the DKW simultaneous confidence band for a CDF."""
-    eps = np.sqrt(np.log(2.0 / alpha) / (2 * n))
-    return eps, eps  # lower/upper half-width (symmetric)
+def gt_selected(system: str, scenario: str, users: int) -> pd.DataFrame:
+    """Mean cumulative energy of the 4 selected GT repetitions on GRID."""
+    curves = []
+    for f in sorted((ENERGY_DIR / system / scenario / str(users)).glob("*.energy")):
+        d = pd.read_csv(f).dropna(subset=["time"])
+        curves.append(np.interp(GRID, d["time"].values, d["joules_total"].values))
+    return pd.DataFrame({"time": GRID, "mean": np.mean(curves, axis=0)})
 
 
-# --------------------------------------------------------------------------- #
-# 1. Over-time, per simulator (R1.5 split of fig:overtimes + R2.8 GT band)
-# --------------------------------------------------------------------------- #
-def _overtimes_legend_handles(axes) -> tuple[list, list]:
-    """Collect complete legend handles (some panels lack some power models)."""
-    seen = {}
-    for ax_row in axes:
-        for ax in (ax_row if hasattr(ax_row, "__len__") else [ax_row]):
-            h, l = ax.get_legend_handles_labels()
-            for hi, li in zip(h, l):
-                if li not in seen and li != "_nolegend_":
-                    seen[li] = hi
-    handles, labels = [], []
-    for pm in ["constant", "linear", "cubic", "square", "sqrt"]:
-        if pm in seen:
-            handles.append(seen[pm])
-            labels.append(pm)
-    if GT_LABEL in seen:
-        handles.append(seen[GT_LABEL])
-        labels.append(GT_LABEL)
-    else:
-        handles.append(plt.Line2D([], [], color="black", linewidth=1.6))
-        labels.append(GT_LABEL)
-    handles.append(plt.Rectangle((0, 0), 1, 1, color="black", alpha=0.18))
-    labels.append("ground truth range (4 reps)")
-    return handles, labels
+_GT30_CACHE: dict[tuple, np.ndarray] = {}
 
 
-def fig_overtimes() -> None:
-    """fig:overtimes revision (R1.5/R2.8) — ONE FIGURE PER SYSTEM.
+def gt_all30(system: str, scenario: str, users: int) -> np.ndarray:
+    """Cumulative energy curves (30 x len(GRID)) of ALL measured repetitions.
 
-    40 panels in one figure was unreadable (Max). Now:
-      overtimes_sockshop_per_simulator.pdf  (4 wide x 5 tall = 20 panels)
-      overtimes_trainticket_per_simulator.pdf
-    Rows = simulators, columns = scenario/users treatments. Each panel:
-    that simulator's power models + GT mean and min..max band of the 4 reps.
+    Trapezoid rule over the raw host power (paper eq. energy_trapezoid); verified to
+    reproduce evaluation/energy/{...}.energy exactly for the selected repetitions.
     """
-    ncols = 4  # treatments: (A,100) (A,1000) (B,100) (B,1000)
-    for system in ["sockshop", "trainticket"]:
-        nrows = len(SIMULATORS)
-        fig, axes = plt.subplots(nrows, ncols, figsize=(11.0, 2.4 * nrows),
-                                 sharex=True, sharey=True)
-
-        for r, sim in enumerate(SIMULATORS):
-            for c, (scenario, users) in enumerate(
-                    product(["A", "B"], [100, 1000])):
-                ax = axes[r, c]
-                curves = sim_curves(sim, system, scenario, users)
-                for pm in curves["powermodel"].dropna().unique():
-                    d = curves[curves["powermodel"] == pm]
-                    ax.plot(d["time"], d["joules_total"], linewidth=1.1,
-                            label=pm, **PM_STYLE.get(pm, {}))
-                gt = gt_mean_curve(system, scenario, users)
-                ax.fill_between(gt["time"], gt["min"], gt["max"],
-                                color="black", alpha=0.18, linewidth=0,
-                                label="_nolegend_")
-                ax.plot(gt["time"], gt["mean"], color="black", linewidth=1.6,
-                        label=GT_LABEL)
-                if r == nrows - 1:
-                    ax.set_xlabel("time (s)", fontsize=8)
-                if r == 0:
-                    ax.set_title(f"scenario {scenario}, {users} users", fontsize=8)
-                if c == 0:
-                    ax.set_ylabel(f"{PRETTY[sim]}\ncumulative energy (J)",
-                                  fontsize=8)
-                ax.tick_params(labelsize=7)
-
-        handles, labels = _overtimes_legend_handles(axes)
-        fig.legend(handles, labels, loc="upper center", ncol=7,
-                   bbox_to_anchor=(0.5, 1.003))
-        fig.tight_layout(rect=(0, 0, 1, 0.985))
-        fig.subplots_adjust(hspace=0.28)
-        for ext in ("pdf", "png"):
-            fig.savefig(OUT_DIR / f"overtimes_{system}_per_simulator.{ext}",
-                        bbox_inches="tight", dpi=200 if ext == "png" else None)
-        plt.close(fig)
+    key = (system, scenario, users)
+    if key not in _GT30_CACHE:
+        pattern = str(RAW_GT_DIR / f"{system}-data" / f"scenario_{scenario}" / "baseline"
+                      / str(users) / "repetition_*" / "metrics.csv")
+        curves = []
+        for path in sorted(glob.glob(pattern), key=lambda p: int(re.search(r"repetition_(\d+)", p).group(1))):
+            d = pd.read_csv(path).sort_values("time")
+            pw = d[[c for c in d.columns if "host_power" in c][0]].values
+            t = d["time"].values - d["time"].values[0]
+            ok = ~np.isnan(pw)
+            t, pw = t[ok], pw[ok]
+            e = np.concatenate([[0.0], np.cumsum((pw[1:] + pw[:-1]) / 2 * np.diff(t))])
+            curves.append(np.interp(GRID, t, e))
+        _GT30_CACHE[key] = np.array(curves)
+    return _GT30_CACHE[key]
 
 
+def gt_band(system: str, scenario: str, users: int) -> tuple[np.ndarray, np.ndarray]:
+    c = gt_all30(system, scenario, users)
+    return np.percentile(c, 10, axis=0), np.percentile(c, 90, axis=0)
 
-# --------------------------------------------------------------------------- #
-# 2. fig:bestOverTime revision — faceted per simulator + GT band
-# --------------------------------------------------------------------------- #
-def fig_best_over_time() -> None:
-    """fig:bestOverTime revision (R1.5): one PANEL PER SIMULATOR, stacked vertically.
 
-    Max: 5-across was too wide to read; a 5x1 vertical stack keeps each panel
-    full text width and readable. Panels share the x axis (time) and y axis
-    (cumulative energy). Each panel: simulator's best power model curve +
-    ground truth mean over all 32 treatments and the mean-over-treatments of
-    the per-treatment 4-rep min..max range (R2.8 variability indication).
+def gt_cdf_vals(system: str) -> np.ndarray:
+    """Total energy of each selected GT repetition of `system` (16 values).
+
+    The sim .energy files repeat each GT total on every run row; de-duplicate to one
+    value per (scenario, users, repetition) so n is right for the DKW band.
     """
-    best = {"cloudsim": "cubic", "networkcloudsim": "cubic", "dissectcf": "constant",
-            "opendc": "constant", "simgrid": "linear"}
-    fig, axes = plt.subplots(len(SIMULATORS), 1, figsize=(7.0, 2.1 * len(SIMULATORS)),
-                             sharex=True, sharey=True)
+    df = sim_df("cloudsim")
+    sub = df[(df["time"].round() == T_END) & (df["test_system"] == system)]
+    return np.sort(sub.groupby(["scenario", "users", "repetition"])
+                   ["joules_total_correct"].first().dropna().values)
 
-    # Precompute GT curves (shared across panels)
-    ref = gt_mean_curve("sockshop", "A", 100)[["time"]]
-    means, mins, maxs = [], [], []
-    for _, row in ref.iterrows():
-        t = row["time"]
-        per_treat_mean, per_treat_min, per_treat_max = [], [], []
-        for system, scenario, users in TREATMENTS:
-            gt = gt_traces(system, scenario, users)
-            vals = []
-            for rep, tdf in gt.items():
-                d = tdf[np.isclose(tdf["time"], t)]
-                if len(d):
-                    vals.append(float(d["joules_total"].iloc[0]))
-            if vals:
-                per_treat_mean.append(np.mean(vals))
-                per_treat_min.append(np.min(vals))
-                per_treat_max.append(np.max(vals))
-        means.append(np.mean(per_treat_mean))
-        mins.append(np.mean(per_treat_min))
-        maxs.append(np.mean(per_treat_max))
 
-    for i, sim in enumerate(SIMULATORS):
-        ax = axes[i]
-        df = sim_df(sim)
-        pm = best[sim]
-        mean_curve = sub = df[df["powermodel"] == pm]
-        mean_curve = mean_curve.groupby("time")["joules_total"].mean()
-        ax.plot(mean_curve.index, mean_curve.values, linewidth=1.4,
-                color=PM_STYLE[pm]["color"], label=pm)
-        ax.fill_between(ref["time"], mins, maxs, color="black", alpha=0.15,
-                        linewidth=0)
-        ax.plot(ref["time"], means, color="black", linewidth=1.8, label=GT_LABEL)
-        ax.set_ylabel(f"{PRETTY[sim]}\n({pm})", fontsize=8)
-        ax.legend(fontsize=7, loc="lower right")
-        ax.tick_params(labelsize=7)
+def add_legends(fig, pms, gt_band_label, sim_band=True, gt_label=GT_LABEL,
+                y=1.0, pm_ncol=3, x_split=0.5):
+    """Two titled legends at the top: 'Power model' (left) and
+    'Ground truth & variability' (right)."""
+    pm_h = [plt.Line2D([], [], linewidth=SIM_LW, **PM_STYLE[p]) for p in pms]
+    gt_h = [plt.Line2D([], [], color="black", linewidth=GT_LW),
+            plt.Rectangle((0, 0), 1, 1, color="black", alpha=GT_BAND_ALPHA, linewidth=0)]
+    gt_l = [gt_label, gt_band_label]
+    if sim_band:
+        gt_h.append(plt.Rectangle((0, 0), 1, 1, facecolor="0.45", alpha=SIM_BAND_ALPHA + 0.07,
+                                  linewidth=0))
+        gt_l.append(SIM_BAND_LABEL)
+    common = dict(frameon=False, handlelength=2.6, columnspacing=1.2, borderaxespad=0.2)
+    leg1 = fig.legend(pm_h, list(pms), title="Power model", ncol=pm_ncol,
+                      loc="upper right", bbox_to_anchor=(x_split - 0.01, y), **common)
+    leg2 = fig.legend(gt_h, gt_l, title="Ground truth & variability", ncol=1,
+                      loc="upper left", bbox_to_anchor=(x_split + 0.01, y), **common)
+    for leg in (leg1, leg2):
+        leg.get_title().set_fontweight("bold")
 
-    axes[-1].set_xlabel("time (s)", fontsize=8)
-    fig.supylabel("cumulative energy consumption (J)", fontsize=9)
-    fig.tight_layout(rect=(0.015, 0, 1, 1))
+
+def save(fig, name: str) -> None:
     for ext in ("pdf", "png"):
-        fig.savefig(OUT_DIR / f"mean_total_pwr_per_simulator.{ext}",
-                    bbox_inches="tight", dpi=200 if ext == "png" else None)
+        fig.savefig(OUT_DIR / f"{name}.{ext}", dpi=220 if ext == "png" else None)
     plt.close(fig)
 
 
 # --------------------------------------------------------------------------- #
-# 3. CDF per simulator with DKW band on GT
+# fig:cdf -- 2 x 5 small multiples (rows: application, cols: simulator)
 # --------------------------------------------------------------------------- #
-def _gt_cdf_vals(system: str, scenario: str | None, users: int | None):
-    """Total energy of each independent selected GT repetition of `system`.
-
-    The .energy files repeat each GT total on every simulation-run row (120x per
-    repetition), so de-duplicate to one value per (scenario, users, repetition):
-    16 per system (4 treatments x 4 reps). Using the duplicated rows would pool
-    nothing wrong for the CDF shape but inflate n for the DKW band ~120x.
-    """
-    df = sim_df("cloudsim")  # any sim file carries joules_total_correct per rep
-    sub = df[(df["time"].round() == 300) & (df["test_system"] == system)]
-    if scenario is not None:
-        sub = sub[(sub["scenario"] == scenario) & (sub["users"] == users)]
-    vals = (sub.groupby(["scenario", "users", "repetition"])
-            ["joules_total_correct"].first().dropna().values)
-    return np.sort(vals)
-
-
-def _plot_cdf(ax, samples: np.ndarray, label: str, color: str,
-              linestyle: str = "-", band: bool = False) -> None:
-    n = len(samples)
-    x = samples
-    y = np.arange(1, n + 1) / n
-    xs = np.r_[x[0], x, x[-1]]
-    ys = np.r_[0.0, y, y[-1]]
-    if band:
-        eps = np.sqrt(np.log(2.0 / 0.05) / (2 * n))
-        ax.fill_between(xs, np.clip(ys - eps, 0, 1), np.clip(ys + eps, 0, 1),
-                        color=color, alpha=0.18, linewidth=0,
-                        label="_nolegend_", step="pre")
-    ax.step(xs, ys, where="post", label=label, color=color,
-            linestyle=linestyle, linewidth=1.4)
-
-
-def fig_cdf_per_simulator(systems=("sockshop", "trainticket")) -> None:
-    """fig:cdf revision (R1.5/R2.8) — one figure PER SYSTEM (Max: 2x5 grid too dense).
-
-    Each figure: 5 panels in a row (one per simulator). Panel: CDF step curves
-    per power model of the per-repetition mean totals (30 simulation runs each);
-    black GT step CDF with DKW simultaneous 95% confidence band.
-    """
-    for system in systems:
-        fig, axes = plt.subplots(1, len(SIMULATORS),
-                                 figsize=(3.0 * len(SIMULATORS), 3.4),
-                                 sharey=True)
-        axes = np.atleast_1d(axes)
-
+def fig_cdf() -> None:
+    fig, axes = plt.subplots(len(SYSTEMS), len(SIMULATORS), figsize=(TEXTWIDTH_IN, 3.3),
+                             sharex=True, sharey=True,
+                             gridspec_kw=dict(wspace=0.1, hspace=0.14, left=0.085,
+                                              right=0.945, top=0.735, bottom=0.125))
+    for r, system in enumerate(SYSTEMS):
+        gtv = gt_cdf_vals(system)
+        n = len(gtv)
+        eps = np.sqrt(np.log(2 / 0.05) / (2 * n))
         for c, sim in enumerate(SIMULATORS):
-            ax = axes[c]
+            ax = axes[r, c]
             df = sim_df(sim)
-            for pmm in sorted(df["powermodel"].dropna().unique()):
-                sub = df[(df["time"].round() == 300)
-                         & (df["powermodel"] == pmm)
-                         & (df["test_system"] == system)].dropna(
-                             subset=["joules_total"])
-                if len(sub) == 0:
+            end = df[(df["time"].round() == T_END) & (df["test_system"] == system)]
+            for pm in PM_ORDER:
+                sub = end[end["powermodel"] == pm].dropna(subset=["joules_total"])
+                if sub.empty:
                     continue
-                t = (sub.groupby(["test_system", "scenario", "users", "repetition"])
-                     ["joules_total"].mean().values)
-                _plot_cdf(ax, np.sort(t), label=pmm, color=PM_STYLE[pmm]["color"],
-                          linestyle=PM_STYLE[pmm]["linestyle"], band=False)
-            gt = _gt_cdf_vals(system, None, None)
-            _plot_cdf(ax, gt, label=GT_LABEL, color="black", band=True)
-            ax.set_xlabel("total energy consumption (J)", fontsize=8)
-            ax.set_title(f"{PRETTY[sim]}", fontsize=8)
-            if c == 0:
-                ax.set_ylabel(f"CDF — {system}", fontsize=8)
-            ax.set_xlim(600, 2400)
-            ax.tick_params(labelsize=7)
-
-        seen = {}
-        for ax in axes:
-            h, l = ax.get_legend_handles_labels()
-            for hi, li in zip(h, l):
-                if li not in seen and li != "_nolegend_":
-                    seen[li] = hi
-        handles = []
-        labels = []
-        for pm in ["constant", "linear", "cubic", "square", "sqrt"]:
-            if pm in seen:
-                handles.append(seen[pm])
-                labels.append(pm)
-        if GT_LABEL in seen:
-            handles.append(seen[GT_LABEL])
-        else:
-            handles.append(plt.Line2D([], [], color="black", linewidth=1.4))
-        labels.append(GT_LABEL)
-        handles.append(plt.Rectangle((0, 0), 1, 1, color="black", alpha=0.18))
-        labels.append("ground truth 95% band")
-        fig.legend(handles, labels, loc="upper center", ncol=7,
-                   bbox_to_anchor=(0.5, 1.01))
-        fig.tight_layout(rect=(0, 0, 1, 0.94))
-        fig.subplots_adjust(wspace=0.16)
-        for ext in ("pdf", "png"):
-            fig.savefig(OUT_DIR / f"cdf_{system}_per_simulator.{ext}",
-                        bbox_inches="tight", dpi=200 if ext == "png" else None)
-        plt.close(fig)
+                t = np.sort(sub.groupby(["scenario", "users", "repetition"])
+                            ["joules_total"].mean().values)
+                k = len(t)
+                ax.step(np.r_[t[0], t, t[-1]], np.r_[0, np.arange(1, k + 1) / k, 1],
+                        where="post", linewidth=SIM_LW, **PM_STYLE[pm])
+            xs = np.r_[gtv[0], gtv, gtv[-1]]
+            ys = np.r_[0, np.arange(1, n + 1) / n, 1]
+            ax.fill_between(xs, np.clip(ys - eps, 0, 1), np.clip(ys + eps, 0, 1),
+                            step="post", color="black", alpha=GT_BAND_ALPHA,
+                            linewidth=0, zorder=3)
+            ax.step(xs, ys, where="post", color="black", linewidth=GT_LW, zorder=4)
+            if r == 0:
+                ax.set_title(PRETTY[sim], pad=5, **STRIP)
+            if c == len(SIMULATORS) - 1:   # application label on the right edge
+                ax.text(1.06, 0.5, SYS_PRETTY[system], transform=ax.transAxes,
+                        rotation=270, ha="left", va="center", **STRIP)
+    axes[0, 0].set_xlim(600, 2450)
+    axes[0, 0].set_xticks([1000, 1500, 2000])
+    axes[0, 0].set_yticks([0, 0.5, 1])
+    fig.text(0.515, 0.015, "total energy consumption (J)", ha="center", **OUTER)
+    fig.text(0.01, 0.43, "CDF", rotation=90, va="center", **OUTER)
+    add_legends(fig, PM_ORDER, "95% DKW confidence band", sim_band=False,
+                gt_label="ground truth (16 selected reps)", x_split=0.52)
+    save(fig, "cdf_per_simulator")
 
 
 # --------------------------------------------------------------------------- #
-# 4. Runtimes with explicit n (fig:runtimes)
+# fig:bestOverTime -- 5 x 1, best power model per simulator, averaged over treatments
+# --------------------------------------------------------------------------- #
+def fig_best_over_time() -> None:
+    gt_mean = np.mean([gt_selected(*t)["mean"].values for t in TREATMENTS], axis=0)
+    gt_lo = np.mean([gt_band(*t)[0] for t in TREATMENTS], axis=0)
+    gt_hi = np.mean([gt_band(*t)[1] for t in TREATMENTS], axis=0)
+
+    fig, axes = plt.subplots(len(SIMULATORS), 1, figsize=(TEXTWIDTH_IN * 0.92, 6.4),
+                             sharex=True, sharey=True,
+                             gridspec_kw=dict(hspace=0.14, left=0.11, right=0.98,
+                                              top=0.86, bottom=0.075))
+    for ax, sim in zip(axes, SIMULATORS):
+        pm = BEST_PM[sim]
+        parts = []
+        for t in TREATMENTS:
+            b = sim_band(sim, *t)
+            parts.append(b[b["powermodel"] == pm].set_index("time")[["mean", "min", "max"]])
+        avg = pd.concat(parts).groupby(level=0).mean()
+        ax.fill_between(avg.index, avg["min"], avg["max"], color=PM_STYLE[pm]["color"],
+                        alpha=SIM_BAND_ALPHA, linewidth=0)
+        ax.plot(avg.index, avg["mean"], linewidth=SIM_LW, **PM_STYLE[pm])
+        ax.fill_between(GRID, gt_lo, gt_hi, color="black", alpha=GT_BAND_ALPHA,
+                        linewidth=0, zorder=3)
+        ax.plot(GRID, gt_mean, color="black", linewidth=GT_LW, zorder=4)
+        ax.text(0.012, 0.9, f"{PRETTY[sim]} ({pm})", transform=ax.transAxes,
+                ha="left", va="top", zorder=6, **STRIP)
+    axes[0].set_xlim(0, T_END)
+    axes[0].set_ylim(-50, 2150)
+    axes[0].set_yticks([0, 500, 1000, 1500, 2000])
+    fig.text(0.545, 0.012, "time (s)", ha="center", **OUTER)
+    fig.text(0.012, 0.47, "cumulative energy consumption (J)", rotation=90,
+             va="center", **OUTER)
+    add_legends(fig, ["constant", "linear", "cubic"], GT_BAND_LABEL, x_split=0.47)
+    save(fig, "mean_total_pwr_per_simulator")
+
+
+# --------------------------------------------------------------------------- #
+# fig:overtimes -- 5 x 8 small multiples (rows: simulators; cols: treatments)
+# --------------------------------------------------------------------------- #
+def fig_overtimes() -> None:
+    nrows = len(SIMULATORS)
+    fig = plt.figure(figsize=(TEXTWIDTH_IN, 5.6))
+    gs = GridSpec(nrows, 9, figure=fig, width_ratios=[1, 1, 1, 1, 0.22, 1, 1, 1, 1],
+                  wspace=0.12, hspace=0.16, left=0.205, right=0.995, top=0.765,
+                  bottom=0.075)
+    axes, first = {}, None
+    for r, sim in enumerate(SIMULATORS):
+        for si, system in enumerate(SYSTEMS):
+            for ci, (scen, users) in enumerate(SCEN_USERS):
+                col = ci + 5 * si
+                ax = fig.add_subplot(gs[r, col], sharex=first, sharey=first)
+                first = first or ax
+                axes[r, col] = ax
+                band = sim_band(sim, system, scen, users)
+                for pm in PM_ORDER:
+                    d = band[band["powermodel"] == pm]
+                    if d.empty:
+                        continue
+                    ax.fill_between(d["time"], d["min"], d["max"],
+                                    color=PM_STYLE[pm]["color"], alpha=SIM_BAND_ALPHA,
+                                    linewidth=0)
+                    ax.plot(d["time"], d["mean"], linewidth=SIM_LW, **PM_STYLE[pm])
+                lo, hi = gt_band(system, scen, users)
+                ax.fill_between(GRID, lo, hi, color="black", alpha=GT_BAND_ALPHA,
+                                linewidth=0, zorder=3)
+                ax.plot(GRID, gt_selected(system, scen, users)["mean"], color="black",
+                        linewidth=GT_LW, zorder=4)
+                if r == 0:
+                    ax.set_title(f"{scen} · {users}", pad=5, **STRIP)
+                if col == 0:
+                    ax.set_ylabel(ROW_LABEL[sim], rotation=0, ha="center", va="center",
+                                  labelpad=26, **STRIP)
+                else:
+                    ax.tick_params(labelleft=False)
+                if r != nrows - 1:
+                    ax.tick_params(labelbottom=False)
+    first.set_xticks([0, 100, 200])
+    first.set_yticks([0, 1000, 2000])
+    first.set_xlim(0, T_END)
+    first.set_ylim(-80, 2600)
+    y_hdr = axes[0, 0].get_position().y1 + 0.045
+    for si, system in enumerate(SYSTEMS):
+        x0 = axes[0, 5 * si].get_position().x0
+        x1 = axes[0, 5 * si + 3].get_position().x1
+        fig.text((x0 + x1) / 2, y_hdr + 0.006, SYS_PRETTY[system], ha="center",
+                 va="bottom", **GROUP)
+        fig.add_artist(plt.Line2D([x0, x1], [y_hdr, y_hdr], color="0.3", linewidth=0.7))
+    fig.text(0.6, 0.012, "time (s)", ha="center", **OUTER)
+    fig.text(0.008, 0.42, "cumulative energy consumption (J)", rotation=90,
+             va="center", **OUTER)
+    add_legends(fig, PM_ORDER, GT_BAND_LABEL, x_split=0.47)
+    save(fig, "overtimes_per_simulator")
+
+
+# --------------------------------------------------------------------------- #
+# fig:runtimes -- box + jitter, n per simulator
 # --------------------------------------------------------------------------- #
 def _load_runtimes() -> pd.DataFrame:
     """Raw per-run simulation times, same sources as evaluation/runtime/get_runtimes.py."""
@@ -405,13 +372,11 @@ def _load_runtimes() -> pd.DataFrame:
         if "users" in d.columns:
             d = d[d["users"] == 1000]  # get_runtimes.py filters users==1000
         if label == "OpenDC":
-            # runs.time stores one row per experiment run; each experiment simulates
-            # len(workloads) workloads -> expand to per-workload times (same as
-            # get_runtimes.py opendc_row)
+            # one row per experiment run, each simulating len(workloads) workloads ->
+            # expand to per-workload times (same as get_runtimes.py opendc_row)
             times = []
             for _, row in d.iterrows():
-                exp_path = ROOT / "simulators/openDC" / str(row["file"])
-                with open(exp_path) as f:
+                with open(ROOT / "simulators/openDC" / str(row["file"])) as f:
                     n_workloads = len(json.load(f)["workloads"])
                 times += [row["time"] / n_workloads] * n_workloads
             d = pd.DataFrame({"time": times})
@@ -423,53 +388,37 @@ def _load_runtimes() -> pd.DataFrame:
 
 
 def fig_runtimes() -> None:
+    import seaborn as sns
     df = _load_runtimes()
     order = ["CloudSim", "DISSECT-CF", "NetworkCloudSim", "OpenDC", "SimGrid",
              "SimGrid with comm."]
-    fig, ax = plt.subplots(figsize=(9, 4.2))
-    ax = sns_box(df, order, ax)
-    counts = df.groupby("simulator")["time"].count()
-    labels = [f"{o}\n(n={counts.get(o, 0)})" for o in order]
-    ax.set_xticks(range(len(order)))
-    ax.set_xticklabels(labels, fontsize=8)
-    ax.set_xlabel("simulator", fontsize=9)
-    ax.set_ylabel("simulation time (s)", fontsize=9)
-    ax.tick_params(axis="y", labelsize=8)
-
-    fig.tight_layout()
-    for ext in ("pdf", "png"):
-        fig.savefig(OUT_DIR / f"runtimes_revised.{ext}", bbox_inches="tight",
-                    dpi=200 if ext == "png" else None)
-    plt.close(fig)
-
-
-def sns_box(df, order, ax):
-    import seaborn as sns
+    fig, ax = plt.subplots(figsize=(TEXTWIDTH_IN, 2.9))
     sns.stripplot(data=df, x="simulator", y="time", order=order, ax=ax,
-                  color="#E57E00", alpha=0.35, jitter=0.35, s=4, zorder=1)
-    ax = sns.boxplot(data=df, x="simulator", y="time", order=order, ax=ax,
-                     showcaps=True, boxprops={"facecolor": "None", "zorder": 10},
-                     medianprops={"color": "black", "zorder": 11},
-                     whiskerprops={"zorder": 10}, capprops={"zorder": 10})
-    return ax
+                  color="#E57E00", alpha=0.3, jitter=0.35, s=2.5, zorder=1)
+    sns.boxplot(data=df, x="simulator", y="time", order=order, ax=ax, width=0.6,
+                showcaps=True, fliersize=0, linewidth=0.8,
+                boxprops={"facecolor": "none", "zorder": 10},
+                medianprops={"color": "black", "zorder": 11},
+                whiskerprops={"zorder": 10}, capprops={"zorder": 10})
+    counts = df.groupby("simulator")["time"].count()
+    ax.set_xticks(range(len(order)))
+    ax.set_xticklabels([f"{o}\n(n = {counts.get(o, 0)})" for o in order], fontsize=7.5)
+    ax.set_xlabel("simulator", **OUTER)
+    ax.set_ylabel("simulation time (s)", **OUTER)
+    ax.grid(axis="x", visible=False)
+    fig.tight_layout(pad=0.3)
+    save(fig, "runtimes_revised")
 
 
 # --------------------------------------------------------------------------- #
 def main(argv: list[str]) -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    which = argv[1:] or ["overtimes", "fig6", "cdf", "runtimes"]
-    if "overtimes" in which:
-        print("generating overtimes_{sockshop,trainticket}_per_simulator ...")
-        fig_overtimes()
-    if "fig6" in which:
-        print("generating mean_total_pwr_per_simulator (vertical stack) ...")
-        fig_best_over_time()
-    if "cdf" in which:
-        print("generating cdf_{sockshop,trainticket}_per_simulator ...")
-        fig_cdf_per_simulator()
-    if "runtimes" in which:
-        print("generating runtimes_revised ...")
-        fig_runtimes()
+    which = argv[1:] or ["cdf", "fig6", "overtimes", "runtimes"]
+    for key, fn in [("cdf", fig_cdf), ("fig6", fig_best_over_time),
+                    ("overtimes", fig_overtimes), ("runtimes", fig_runtimes)]:
+        if key in which:
+            print(f"generating {key} ...")
+            fn()
     print("done ->", OUT_DIR)
 
 

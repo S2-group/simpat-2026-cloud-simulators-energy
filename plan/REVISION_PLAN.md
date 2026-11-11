@@ -26,9 +26,9 @@ Reviewer: documentation/adoption judged by one researcher; only 3 maintainers re
 **Agreed approach (Ivano's protocol)**: second researcher (Max) re-verifies every RQ2 assessment, notes agreement/disagreement with reasons; Ivano arbitrates conflicts; paper reports this 3-researcher process.
 
 - ☑ Assistant: claim-by-claim checklist extracted → `plan/R1.4_verification_checklist.md`
-  (25 claims A1–C9 from RQ2.1/RQ2.2, evidence pointers: `figures/sc-*.png`, local
+  (8 key items A1–C4, condensed from 23 claims in RQ2.1/RQ2.2; evidence pointers: `figures/sc-*.png`, local
   `simulators/` sources, external docs; plus response-letter items D1–D3)
-- ☐ **Max**: work through checklist; decide per claim (agree / disagree + why / uncertain)
+- ☐ **Max**: work through checklist; decide per item (agree / disagree + why / uncertain)
 - ☐ Ivano: arbitrate disagreements
 - ☐ **Max** (writing): update *Study Design* (`experimentPlan.tex`) and *Conclusion Validity* (`threats.tex`, line ~28 — currently only mentions the 3 maintainer responses); wrap new text in `\rone{}`; write response-letter entry
 
