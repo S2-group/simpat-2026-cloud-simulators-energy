@@ -286,13 +286,19 @@ def fig_best_over_time() -> None:
 # 3. CDF per simulator with DKW band on GT
 # --------------------------------------------------------------------------- #
 def _gt_cdf_vals(system: str, scenario: str | None, users: int | None):
-    """Total-energy samples of the (selected) GT runs for CDF construction."""
+    """Total energy of each independent selected GT repetition of `system`.
+
+    The .energy files repeat each GT total on every simulation-run row (120x per
+    repetition), so de-duplicate to one value per (scenario, users, repetition):
+    16 per system (4 treatments x 4 reps). Using the duplicated rows would pool
+    nothing wrong for the CDF shape but inflate n for the DKW band ~120x.
+    """
     df = sim_df("cloudsim")  # any sim file carries joules_total_correct per rep
-    sub = df[(df["time"].round() == 300)]
+    sub = df[(df["time"].round() == 300) & (df["test_system"] == system)]
     if scenario is not None:
-        sub = sub[(sub["test_system"] == system) & (sub["scenario"] == scenario)
-                  & (sub["users"] == users)]
-    vals = sub["joules_total_correct"].dropna().values
+        sub = sub[(sub["scenario"] == scenario) & (sub["users"] == users)]
+    vals = (sub.groupby(["scenario", "users", "repetition"])
+            ["joules_total_correct"].first().dropna().values)
     return np.sort(vals)
 
 
