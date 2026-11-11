@@ -1,5 +1,4 @@
-Replication package for _A Comparative Study on the Suitability of Cloud Simulators for
-Estimating Energy Usage of Microservices_.
+Replication package for _A Comparative Study on the Suitability of Cloud Simulators for Trace-Driven Estimation of Host-Level Energy Usage of Microservice Systems_.
 
 To replicate the results presented in this study, the following steps can be followed:
 # 1. Ground Truth Collection
