@@ -92,12 +92,12 @@ plt.rcParams.update({
 })
 
 # Label hierarchy (same in every figure):
-#   outer axis labels  9 pt bold       e.g. "time (s)"
-#   group headers      8.5 pt bold     e.g. "Sock Shop" (with a rule underneath)
+#   outer axis labels  9 pt            e.g. "time (s)"
+#   group headers      8.5 pt          e.g. "Sock Shop" (with a rule underneath)
 #   panel labels       7.5 pt  (simulator / treatment / application)
 #   tick labels        6.5 pt
-OUTER = dict(fontsize=9, fontweight="bold")
-GROUP = dict(fontsize=8.5, fontweight="bold")
+OUTER = dict(fontsize=9)
+GROUP = dict(fontsize=8.5)
 STRIP = dict(fontsize=7.5)
 
 
@@ -199,8 +199,6 @@ def add_legends(fig, pms, gt_band_label, sim_band=True, gt_label=GT_LABEL,
                       loc="upper right", bbox_to_anchor=(x_split - 0.01, y), **common)
     leg2 = fig.legend(gt_h, gt_l, title="Ground truth & variability", ncol=1,
                       loc="upper left", bbox_to_anchor=(x_split + 0.01, y), **common)
-    for leg in (leg1, leg2):
-        leg.get_title().set_fontweight("bold")
 
 
 def save(fig, name: str) -> None:
