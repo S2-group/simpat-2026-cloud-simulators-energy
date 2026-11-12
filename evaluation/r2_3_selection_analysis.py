@@ -1,33 +1,4 @@
 #!/usr/bin/env python3
-"""
-R2.3 analysis: quantitative justification of the "4-of-30 median trace selection".
-
-Reviewer concern (R2.3): taking only the 4 repetitions closest to the median energy
-skews the ground truth toward an artificially clean workload, potentially improving
-the perceived simulator accuracy.
-
-What this script does (no simulations re-run):
-  1. Recomputes the ground-truth total energy (trapezoid rule over the host power
-     column, mirroring evaluation/gen_energy.py and eq. energy_trapezoid in the
-     paper) for ALL 30 repetitions of all 128 treatments (2 systems x 2 scenarios
-     x 2 user loads) -> wait, 2*2*2 = 8 treatment groups x 30 reps = 240 rows.
-  2. Loads the simulated total energy at t=300 s from evaluation/energy/*.energy
-     (each treatment x power model already averages 30 simulation runs).
-  3. Computes, per treatment and power model, the MRE of the simulated mean total
-     against
-       a) the mean total energy of the selected 4 repetitions (as in the paper), and
-       b) the mean total energy of all 30 repetitions.
-  4. Aggregates per simulator (best power model = the one used in the paper plots)
-     and writes:
-       - outputs/r2_3_per_treatment.csv   (per treatment x power model numbers)
-       - outputs/r2_3_per_simulator.csv   (aggregated MREs, sel-4 vs all-30)
-       - outputs/r2_3_best_powermodel.tex (LaTeX table rows for the paper/appendix)
-
-Usage:
-    /path/to/.venv/bin/python r2_3_selection_analysis.py
-Run from anywhere; paths are resolved relative to this file.
-"""
-
 from __future__ import annotations
 
 import csv
@@ -40,7 +11,7 @@ from pathlib import Path
 # --------------------------------------------------------------------------- #
 # Configuration
 # --------------------------------------------------------------------------- #
-ROOT = Path(__file__).resolve().parents[2]          # repo root
+ROOT = Path(__file__).resolve().parents[1]          # repo root
 GT_GLOB = (
     ROOT / "ground-truth" / "vuDevOps" / "data_collection"
     / "*-data" / "scenario_*" / "baseline" / "*" / "repetition_*" / "metrics.csv"

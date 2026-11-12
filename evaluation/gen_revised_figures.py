@@ -1,38 +1,4 @@
 #!/usr/bin/env python3
-"""
-Revised result figures for the revision (R1.5: split per simulator; R2.8: variability
-indication, clear legends, consistent terminology).
-
-Figures (PDF for the paper + PNG preview, written to paper/figures/):
-
-  cdf_per_simulator.pdf            fig:cdf          2 x 5 small multiples (system x simulator)
-  mean_total_pwr_per_simulator.pdf fig:bestOverTime 5 x 1 (one panel per simulator)
-  overtimes_per_simulator.pdf      fig:overtimes    5 x 8 small multiples (simulator x treatment)
-  runtimes_revised.pdf             fig:runtimes     box + jitter per simulator, n per group
-
-Variability indication (R2.8) -- chosen per figure:
-  * Simulators: min-max range over the 4 simulated traces of a treatment (each trace's
-    value is the mean of its 30 runs; simulators are near-deterministic per trace, so
-    the full range is the most transparent summary).
-  * Ground truth over time: the line is the mean of the 4 selected repetitions (what the
-    simulators are compared against); the band is the 10th-90th percentile over ALL 30
-    measured repetitions of the treatment. The 4 selected repetitions were chosen as the
-    ones closest to the median energy, so their own min-max range (6-97 J) understates
-    the real run-to-run variability (P10-P90 width 259-552 J). Curves for all 30
-    repetitions are rebuilt from the raw metrics with the paper's trapezoid rule
-    (identical to evaluation/energy/*.energy for the selected ones).
-  * Ground-truth CDF: DKW simultaneous 95% confidence band, n = 16 per system
-    (4 treatments x 4 selected repetitions).
-  * Runtimes: box (quartiles) + whiskers + individual runs; n per simulator.
-
-Terminology: "time (s)", "cumulative energy consumption (J)",
-"total energy consumption (J)", "simulation time (s)".
-
-Usage:
-    .venv/bin/python evaluation/analysis/gen_revised_figures.py [which ...]
-    which in {cdf, fig6, overtimes, runtimes} (default: all)
-"""
-
 from __future__ import annotations
 
 import glob
@@ -49,10 +15,10 @@ import numpy as np
 import pandas as pd
 from matplotlib.gridspec import GridSpec
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[1]
 ENERGY_DIR = ROOT / "evaluation" / "energy"   # sims: {sim}.energy; GT: {system}/{scenario}/{users}/{rep}.energy
 RAW_GT_DIR = ROOT / "ground-truth" / "vuDevOps" / "data_collection"
-OUT_DIR = ROOT / "paper" / "figures"
+OUT_DIR = ROOT / "figures"
 
 SIMULATORS = ["cloudsim", "networkcloudsim", "dissectcf", "opendc", "simgrid"]
 PRETTY = {"cloudsim": "CloudSim", "networkcloudsim": "NetworkCloudSim",
