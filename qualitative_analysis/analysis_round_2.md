@@ -1,5 +1,7 @@
 # R1.4 - Verification of RQ2 Assessments
 
+Author: Max Kartsen
+
 ---
 
 ## A. RQ2.1 — Ease of use: Simulation process

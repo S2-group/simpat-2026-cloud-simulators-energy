@@ -1,3 +1,9 @@
+# Initial version of the main findings related to RQ2
+
+This version comes directly from the first submission of the manuscript.
+
+Author: Meret Baumgartner
+
 ## System Properties Collection
 In order to be able to define the systems used to collect measures for simulation, some properties have to be collected. As a measure of CPU performance, the Instruction Per Cycle (IPC) or variations of it are needed for all simulators except \textit{OpenDC}. This metric is not just dependent on the system but also the applications running. In order to get an approximation of this value, the IPC of the servers running the applications and monitoring tools was calculated using the Linux \verb|perf stat| command over 1 minute and repeated 30 times for both \textit{Sock Shop} and \textit{Train Ticket}. The mean of these 30 IPC values was then taken to be used to configure the cloud simulators. For configuration of the simulators' power models, power consumption measures at three different CPU utilization levels have to be collected: \textit{off}, \textit{idle} and \textit{max}. The off level refers to the powerdraw when it is completely off. As we are collecting the energy usage from the server itself and not its external powerdraw for this study, this value is set to 0. For the idle level, we take the mean of host power values for the time steps of the ground truth dataset for which the sum of CPU usage over all monitored containers is 0\%. For the max level, we do the same but for a CPU usage of 100\% or more, which occurs without additional interference.
 
