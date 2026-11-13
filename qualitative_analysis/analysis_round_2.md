@@ -17,7 +17,6 @@ Author: Max Kartsen
       I haven't tried them, but I would guess that they no longer work with
       the most recent version of cloudsim which released last year. I dont
       think these are viable alternatives for a GUI these days. (DISAGREE)
-  - Arbiter:
 
 - Meret:
   - Only OpenDC has a GUI (a web application). It is very limited: predefined
@@ -44,7 +43,6 @@ Author: Max Kartsen
       Ill run the adjusted calculations to see if there is a difference.
     - SimGrid: On the energy per host point: "only via user code" is a single call
       to sg_host_energy_plugin_init().
-  - Arbiter:
 
 - Meret:
   - All five simulators can retrieve consumed energy at a user-defined frequency
@@ -72,7 +70,6 @@ Author: Max Kartsen
   - Notes: The docs for both of these are very limited, essentially javadoc
     with a bit more description in some places. I would categorize DISSECT-CF as
     having the worse documentation of the two.
-  - Arbiter:
 
 - Meret:
   - CloudSim, being very widely used, has a relatively wide range of documentation
@@ -100,7 +97,6 @@ Author: Max Kartsen
     - This part is a bit subjective. Both OpenDC and SimGrid have sufficient documentation I would say.
     - Also I think OpenDC documentation was moved from its previous location, and updated? It seems up to date.
       There is now OpenDC2 and OpenDC3
-  - Arbiter:
 
 - Merges: old B5 (OpenDC), B6 (SimGrid vs OpenDC), B7 (overall sufficiency).
 - Meret:
@@ -127,7 +123,6 @@ Author: Max Kartsen
     - I would qualify that their definitions are the simplest, because they are modeling
       the least. They do not have as many features, and model as many components as the
       other sims.
-  - Arbiter:
 
 - Meret:
   - DISSECT-CF offers the most settable topology parameters (table
@@ -150,7 +145,6 @@ Author: Max Kartsen
     - I would also qualify the "in principle" part. Its more accurate if the workload
       is defined in instructions right? Our workloads are defined as %cpu usage for n seconds.
       And SimGrid only works in FLOPs anyways.
-  - Arbiter:
 
 - Meret: CloudSim, NetworkCloudSim, DISSECT-CF and SimGrid define host CPU speed via
   IPC variants — context-dependent (OS, apps), must be measured per configuration;
@@ -169,7 +163,6 @@ Author: Max Kartsen
       Technically the full OpenDC API it does bundle parsers for other trace formats.
     - SimGrid: PARTLY. Has a kind of trace replay framework, but it does require the user to do
       some work setting up callbacks to invoke on different parts of the trace.
-  - Arbiter:
 
 - Meret:
   - CloudSim provides swf loading but it is flawed: the *submit time* field is
@@ -190,7 +183,6 @@ Author: Max Kartsen
     - OpenDC Claim: AGREE
     - SimGrid Claim: AGREE, but its actually disk I/O consumption, not memory.
     - Others Claim: CloudSim is also a "discrete event simulator", the other claims are fine.
-  - Arbiter:
 
 - Meret:
   - OpenDC uses two parquet files per workload (jobs + CPU usage snapshots), which
